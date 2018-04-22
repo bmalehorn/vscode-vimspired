@@ -11,14 +11,24 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:bext.sayHello"
+        "onCommand:bext.sayHello",
+        "onCommand:bext.foo"
     ],
     "main": "./out/bext",
     "contributes": {
-        "commands": [{
-            "command": "bext.sayHello",
-            "title": "Hello World"
-        }]
+        "commands": [
+            {
+                "command": "bext.sayHello",
+                "title": "Hello World"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "ctrl+9",
+                "command": "bext.foo",
+                "when": "editorTextFocus"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -28,7 +38,7 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typ escript": "^2.6.1",
+        "typescript": "^2.6.1",
         "vscode": "^1.1.6",
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",

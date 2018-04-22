@@ -22,6 +22,11 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(disposable);
+
+    let foo = vscode.commands.registerCommand("bext.foo", () => {
+        vscode.window.showInformationMessage("Foo!");
+    });
+    context.subscriptions.push(foo);
 }
 
 // this method is called when your extension is deactivated
