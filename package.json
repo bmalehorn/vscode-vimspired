@@ -11,12 +11,12 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:bext.sayHello"
     ],
     "main": "./out/bext",
     "contributes": {
         "commands": [{
-            "command": "extension.sayHello",
+            "command": "bext.sayHello",
             "title": "Hello World"
         }]
     },
@@ -28,7 +28,7 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
+        "typ escript": "^2.6.1",
         "vscode": "^1.1.6",
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
