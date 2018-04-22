@@ -27,6 +27,19 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage("Foo!");
     });
     context.subscriptions.push(foo);
+
+    context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", () => {
+        vscode.commands.executeCommand("setContext", "bext.normal", true);
+        vscode.commands.executeCommand("setContext", "bext.insert", false);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", () => {
+        vscode.commands.executeCommand("setContext", "bext.normal", false);
+        vscode.commands.executeCommand("setContext", "bext.insert", true);
+    }));
+
+    vscode.commands.executeCommand("setContext", "bext.normal", true);
+    vscode.commands.executeCommand("setContext", "bext.insert", false);
 }
 
 // this method is called when your extension is deactivated

@@ -12,7 +12,9 @@
     ],
     "activationEvents": [
         "onCommand:bext.sayHello",
-        "onCommand:bext.foo"
+        "onCommand:bext.foo",
+        "onCommand:bext.enterInsert",
+        "onCommand:bext.enterNormal"
     ],
     "main": "./out/bext",
     "contributes": {
@@ -24,8 +26,28 @@
         ],
         "keybindings": [
             {
-                "key": "ctrl+9",
+                "key": "ctrl+8",
                 "command": "bext.foo",
+                "when": "editorTextFocus && foo"
+            },
+            {
+                "key": "ctrl+7",
+                "command": "bext.enterInsert",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "k",
+                "command": "cursorUp",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "j",
+                "command": "cursorDown",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "Escape",
+                "command": "bext.enterNormal",
                 "when": "editorTextFocus"
             }
         ]
