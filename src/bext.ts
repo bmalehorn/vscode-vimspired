@@ -28,18 +28,27 @@ export function activate(context: vscode.ExtensionContext) {
     });
     context.subscriptions.push(foo);
 
+    function setNormal(normal: boolean) {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+        editor.options.cursorStyle = normal ?
+            vscode.TextEditorCursorStyle.Block :
+            vscode.TextEditorCursorStyle.Underline;
+        vscode.commands.executeCommand("setContext", "bext.normal", normal);
+        vscode.commands.executeCommand("setContext", "bext.insert", !normal);
+    }
+
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", () => {
-        vscode.commands.executeCommand("setContext", "bext.normal", true);
-        vscode.commands.executeCommand("setContext", "bext.insert", false);
+        setNormal(true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", () => {
-        vscode.commands.executeCommand("setContext", "bext.normal", false);
-        vscode.commands.executeCommand("setContext", "bext.insert", true);
+        setNormal(false);
     }));
 
-    vscode.commands.executeCommand("setContext", "bext.normal", true);
-    vscode.commands.executeCommand("setContext", "bext.insert", false);
+    setNormal(true);
 }
 
 // this method is called when your extension is deactivated
