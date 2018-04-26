@@ -11,10 +11,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:bext.sayHello",
-        "onCommand:bext.foo",
-        "onCommand:bext.enterInsert",
-        "onCommand:bext.enterNormal"
+        "*"
     ],
     "main": "./out/bext",
     "contributes": {
