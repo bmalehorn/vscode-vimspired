@@ -23,12 +23,7 @@
         ],
         "keybindings": [
             {
-                "key": "ctrl+8",
-                "command": "bext.foo",
-                "when": "editorTextFocus && foo"
-            },
-            {
-                "key": "ctrl+7",
+                "key": "i",
                 "command": "bext.enterInsert",
                 "when": "editorTextFocus && bext.normal"
             },
@@ -45,7 +40,7 @@
             {
                 "key": "Escape",
                 "command": "bext.enterNormal",
-                "when": "editorTextFocus"
+                "when": "editorTextFocus && bext.insert"
             }
         ]
     },
