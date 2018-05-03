@@ -33,6 +33,11 @@
                 "when": "editorTextFocus && bext.normal"
             },
             {
+                "key": "k",
+                "command": "bext.keypressK",
+                "when": "editorTextFocus && bext.insert"
+            },
+            {
                 "key": "j",
                 "command": "cursorDown",
                 "when": "editorTextFocus && bext.normal"
