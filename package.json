@@ -33,8 +33,8 @@
                 "when": "editorTextFocus && bext.normal"
             },
             {
-                "key": "k",
-                "command": "bext.keypressK",
+                "key": "ctrl+l",
+                "command": "bext.enterNormal",
                 "when": "editorTextFocus && bext.insert"
             },
             {
@@ -43,7 +43,7 @@
                 "when": "editorTextFocus && bext.normal"
             },
             {
-                "key": "Escape",
+                "key": "escape",
                 "command": "bext.enterNormal",
                 "when": "editorTextFocus && bext.insert"
             }
