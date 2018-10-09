@@ -82,7 +82,51 @@
                 "command": "cursorPageDown",
                 "when": "editorTextFocus && bext.normal"
             },
-            
+            {
+                "key": "l",
+                "command": "cursorLeft",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": ";",
+                "command": "cursorRight",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "'",
+                "command": "editor.action.commentLine",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "a",
+                "command": "editor.action.clipboardCopyAction",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "w",
+                "command": "editor.action.clipboardCutAction",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "s",
+                "command": "editor.action.clipboardPasteAction",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "e",
+                "command": "deleteLeft",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "/",
+                "command": "undo",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "shift+/",
+                "command": "redo",
+                "when": "editorTextFocus && bext.normal"
+            },
             {
                 "key": "ctrl+alt+0",
                 "command": "cursorHome",
