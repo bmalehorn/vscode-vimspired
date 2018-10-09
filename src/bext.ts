@@ -8,6 +8,7 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", enterNormal));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", enterInsert));
+    context.subscriptions.push(vscode.commands.registerCommand("bext.openLine", openLine));
     enterNormal();
 }
 
@@ -17,6 +18,19 @@ function enterNormal() {
 
 function enterInsert() {
     setNormal({ normal: false });
+}
+
+function openLine() {
+    // TODO: go to end of line, *then* newline
+    // TODO: indent after newline
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    editor.edit((editBuilder) => {
+        editBuilder.insert(editor.selection.start, "\n");
+    });
+    enterInsert();
 }
 
 interface SetNormalArgs {

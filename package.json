@@ -28,14 +28,19 @@
                 "when": "editorTextFocus && bext.normal"
             },
             {
-                "key": "k",
-                "command": "cursorUp",
-                "when": "editorTextFocus && bext.normal"
-            },
-            {
                 "key": "ctrl+l",
                 "command": "bext.enterNormal",
                 "when": "editorTextFocus && bext.insert"
+            },
+            {
+                "key": "escape",
+                "command": "bext.enterNormal",
+                "when": "editorTextFocus && bext.insert"
+            },
+            {
+                "key": "k",
+                "command": "cursorUp",
+                "when": "editorTextFocus && bext.normal"
             },
             {
                 "key": "j",
@@ -43,9 +48,45 @@
                 "when": "editorTextFocus && bext.normal"
             },
             {
-                "key": "escape",
-                "command": "bext.enterNormal",
-                "when": "editorTextFocus && bext.insert"
+                "key": "r",
+                "command": "bext.openLine",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "5",
+                "command": "cursorTop",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "8",
+                "command": "cursorBottom",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "o",
+                "command": "cursorHome",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "p",
+                "command": "cursorEnd",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "i",
+                "command": "cursorPageUp",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "u",
+                "command": "cursorPageDown",
+                "when": "editorTextFocus && bext.normal"
+            },
+            
+            {
+                "key": "ctrl+alt+0",
+                "command": "cursorHome",
+                "when": "bext.never"
             }
         ]
     },
