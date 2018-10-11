@@ -23,7 +23,7 @@
         ],
         "keybindings": [
             {
-                "key": "i",
+                "key": "f",
                 "command": "bext.enterInsert",
                 "when": "editorTextFocus && bext.normal"
             },
@@ -125,6 +125,31 @@
             {
                 "key": "shift+/",
                 "command": "redo",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "m",
+                "command": "cursorWordStartLeft",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": ",",
+                "command": "cursorWordEndRight",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "v",
+                "command": "actions.find",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "space",
+                "command": "workbench.action.quickOpen",
+                "when": "editorTextFocus && bext.normal"
+            },
+            {
+                "key": "d",
+                "command": "deleteWordLeft",
                 "when": "editorTextFocus && bext.normal"
             },
             {
