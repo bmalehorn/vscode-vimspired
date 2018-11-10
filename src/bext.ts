@@ -6,18 +6,23 @@ import * as vscode from 'vscode';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    context.subscriptions.push(vscode.commands.registerCommand("bext.sayHello", sayHello));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", enterNormal));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", enterInsert));
     context.subscriptions.push(vscode.commands.registerCommand("bext.openLine", openLine));
     enterNormal();
 }
 
+function sayHello() {
+    vscode.window.showInformationMessage("Hello World!");
+}
+
 function enterNormal() {
-    setNormal({ normal: true });
+    setNormal(true);
 }
 
 function enterInsert() {
-    setNormal({ normal: false });
+    setNormal(false);
 }
 
 function openLine() {
@@ -33,12 +38,7 @@ function openLine() {
     enterInsert();
 }
 
-interface SetNormalArgs {
-    normal: boolean;
-}
-
-function setNormal(args: SetNormalArgs) {
-    const { normal } = args;
+function setNormal(normal: boolean) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
         return;
@@ -47,7 +47,6 @@ function setNormal(args: SetNormalArgs) {
         vscode.TextEditorCursorStyle.Block :
         vscode.TextEditorCursorStyle.Underline;
     vscode.commands.executeCommand("setContext", "bext.normal", normal);
-    vscode.commands.executeCommand("setContext", "bext.insert", !normal);
 }
 
 // this method is called when your extension is deactivated

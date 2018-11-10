@@ -19,6 +19,14 @@
             {
                 "command": "bext.sayHello",
                 "title": "Hello World"
+            },
+            {
+                "command": "bext.enterNormal",
+                "title": "Bext: normal mode"
+            },
+            {
+                "command": "bext.enterInsert",
+                "title": "Bext: insert mode"
             }
         ],
         "keybindings": [
@@ -30,12 +38,12 @@
             {
                 "key": "ctrl+l",
                 "command": "bext.enterNormal",
-                "when": "editorTextFocus && bext.insert"
+                "when": "editorTextFocus && !bext.normal"
             },
             {
                 "key": "escape",
                 "command": "bext.enterNormal",
-                "when": "editorTextFocus && bext.insert"
+                "when": "editorTextFocus && !bext.normal"
             },
             {
                 "key": "k",
