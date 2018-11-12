@@ -5,6 +5,8 @@ import * as vscode from 'vscode';
 
 console.log("@@@ hello world");
 
+let typeSubscription: vscode.Disposable | undefined;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -13,9 +15,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", enterInsert));
     context.subscriptions.push(vscode.commands.registerCommand("bext.openLine", openLine));
     console.log("@@@ activate!!!");
-    context.subscriptions.push(vscode.commands.registerCommand("type", e => {
-        console.log("@@@ type e = ", e);
-    }));
     enterNormal();
 }
 
@@ -24,10 +23,34 @@ function sayHello() {
 }
 
 function enterNormal() {
+    typeSubscription = vscode.commands.registerCommand("type", onType);
     setNormal(true);
 }
 
+interface IEvent {
+    text: string;
+}
+
+function onType(event: IEvent) {
+
+    console.log("@@@ type e = ", JSON.stringify(event), event);
+
+
+
+    if (event.text === "j") {
+        vscode.commands.executeCommand("cursorDown");
+    } else if (event.text === "k") {
+        vscode.commands.executeCommand("cursorUp");
+    } else if (event.text === "f") {
+        enterInsert();
+    }
+}
+
 function enterInsert() {
+    if (typeSubscription) {
+        typeSubscription.dispose();
+        typeSubscription = undefined;
+    }
     setNormal(false);
 }
 

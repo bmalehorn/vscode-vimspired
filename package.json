@@ -28,6 +28,13 @@
                 "command": "bext.enterInsert",
                 "title": "Bext: insert mode"
             }
+        ],
+        "keybindings": [
+            {
+                "key": "Escape",
+                "command": "bext.enterNormal",
+                "when": "editorTextFocus && !bext.normal"
+            }
         ]
     },
     "scripts": {
