@@ -33,7 +33,7 @@
             {
                 "key": "Escape",
                 "command": "bext.enterNormal",
-                "when": "editorTextFocus && !bext.normal"
+                "when": "editorTextFocus"
             }
         ]
     },

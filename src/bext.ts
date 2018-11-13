@@ -8,6 +8,14 @@ let typeSubscription: vscode.Disposable | undefined;
 let lastKey: string | undefined;
 let selecting: boolean = false;
 
+function setSelecting(newSelecting: boolean): Thenable<{} | undefined> {
+    return executeCommand("workbench.action.terminal.clearSelection")
+        .then(() => {
+            selecting = newSelecting;
+            return Promise.resolve(undefined);
+        });
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -23,7 +31,9 @@ function sayHello() {
 }
 
 function enterNormal() {
-    typeSubscription = vscode.commands.registerCommand("type", onType);
+    if (!typeSubscription) {
+        typeSubscription = vscode.commands.registerCommand("type", onType);
+    }
     setNormal(true);
 }
 
@@ -40,11 +50,11 @@ function setNormal(normal: boolean) {
     if (!editor) {
         return;
     }
-    selecting = false;
     editor.options.cursorStyle = normal ?
         vscode.TextEditorCursorStyle.Block :
         vscode.TextEditorCursorStyle.Underline;
-    executeCommand("setContext", "bext.normal", normal);
+    executeCommand("setContext", "bext.normal", normal)
+        .then(() => setSelecting(false));
 }
 
 // this method is called when your extension is deactivated
@@ -56,135 +66,116 @@ interface IEvent {
     text: string;
 }
 
-const keymap: Map<string, Thenable<{} | undefined>> = new Map();
-keymap.set("`", Promise.resolve(undefined));
+const keymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
+keymap.set("`", undefined);
+keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
+keymap.set("2", undefined);
+keymap.set("3", undefined);
+keymap.set("4", undefined);
+keymap.set("5", () => executeCommand(selecting ? "cursorTopSelect" : "cursorTop"));
+keymap.set("6", undefined);
+keymap.set("7", () => executeCommand("cursorUndo"));
+keymap.set("8", () => executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom"));
+keymap.set("9", undefined);
+keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
+keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
+keymap.set("-", undefined);
+keymap.set("=", undefined
+);
+keymap.set("q", () => executeCommand("tslint.fixAllProblems"));
+keymap.set("Q", () => executeCommand("editor.action.formatDocument"));
+keymap.set("w", () => {
+    if (selecting) {
+        return executeCommand("editor.action.clipboardCutAction")
+            .then(() => setSelecting(false));
+    } else {
+        return executeCommand("cursorLineStart")
+            .then(() => executeCommand("editor.action.copyLinesDownAction"))
+            .then(() => executeCommand("editor.action.clipboardCutAction"))
+            .then(() => setSelecting(false));
+    }
+});
+keymap.set("e", () => executeCommand("deleteLeft"));
+keymap.set("r", () => {
+    openLine();
+    return Promise.resolve(undefined);
+});
+keymap.set("t", () => {
+    setSelecting(!selecting);
+    return Promise.resolve(undefined);
+});
+keymap.set("y", undefined);
+keymap.set("u", () => executeCommand(selecting ? "cursorPageDownSelect" : "cursorPageDown"));
+keymap.set("i", () => executeCommand(selecting ? "cursorPageUpSelect" : "cursorPageUp"));
+keymap.set("o", () => {
+    // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
+    if (selecting) {
+        return executeCommand("cursorHomeSelect")
+            .then(() => executeCommand("cursorHomeSelect"));
+    } else {
+        return executeCommand("cursorLineStart");
+    }
+});
+keymap.set("O", () => executeCommand(selecting ? "cursorHomeSelect" : "cursorHome"));
+keymap.set("p", () => executeCommand(selecting ? "cursorLineEndSelect" : "cursorLineEnd"));
+keymap.set("[", () => executeCommand("workbench.action.showCommands"));
+keymap.set("]", undefined);
+keymap.set("\\", undefined);
+keymap.set("a", () => {
+    if (selecting) {
+        return executeCommand("editor.action.clipboardCopyAction")
+            .then(() => setSelecting(false));
+    } else {
+        return executeCommand("cursorLineStart")
+            .then(() => executeCommand("editor.action.copyLinesDownAction"))
+            .then(() => executeCommand("editor.action.clipboardCopyAction"))
+            .then(() => setSelecting(false));
+    }
+});
+keymap.set("s", () => executeCommand("editor.action.clipboardPasteAction"));
+keymap.set("d", () => executeCommand("deleteWordLeft"));
+keymap.set("f", () => {
+    enterInsert();
+    return Promise.resolve(undefined);
+});
+keymap.set("g", undefined);
+keymap.set("j", () => executeCommand(selecting ? "cursorDownSelect" : "cursorDown"));
+keymap.set("k", () => executeCommand(selecting ? "cursorUpSelect" : "cursorUp"));
+keymap.set("l", () => executeCommand(selecting ? "cursorLeftSelect" : "cursorLeft"));
+keymap.set(";", () => executeCommand(selecting ? "cursorRightSelect" : "cursorRight"));
+keymap.set("'", () => executeCommand("editor.action.commentLine"));
+keymap.set("z", undefined);
+keymap.set("x", undefined);
+keymap.set("c", undefined);
+keymap.set("v", () => executeCommand("actions.find"));
+keymap.set("b", undefined);
+keymap.set("n", undefined);
+keymap.set("m", () => executeCommand(selecting ? "cursorWordStartLeftSelect" : "cursorWordStartLeft"));
+keymap.set(",", () => executeCommand(selecting ? "cursorWordEndRightSelect" : "cursorWordEndRight"));
+keymap.set("/", () => executeCommand("undo"));
+keymap.set("?", () => executeCommand("redo"));
+keymap.set(" ", () => executeCommand("workbench.action.quickOpen"));
+
+const hKeymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
+hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
+hKeymap.set("x", () => executeCommand("workbench.action.closeAllEditors"));
+
+//     executeCommand("editor.action.goToDeclaration");
+//     executeCommand("workbench.action.reloadWindow");
 
 function onType(event: IEvent) {
-    console.log("event = ", JSON.stringify(event));
 
-    executeCommand("getContext", "textInputFocus", (result: any) => {
-        console.log("@@@ result = ", result);
-    });
-    // {
-    //     "key": "shift+right",
-    //     "command": "cursorRightSelect",
-    //     "when": "textInputFocus"
-    //   }
-
-    if (false) {
-
-    } else if (lastKey === "h" && event.text === "m") {
-        executeCommand("workbench.action.maximizeEditor");
-    } else if (lastKey === "h" && event.text === "x") {
-        executeCommand("workbench.action.closeAllEditors");
-    } else if (event.text === "`") {
-    } else if (event.text === "1") {
-        executeCommand("workbench.action.findInFiles");
-    } else if (event.text === "2") {
-    } else if (event.text === "3") {
-    } else if (event.text === "4") {
-    } else if (event.text === "5") {
-        if (selecting) {
-            executeCommand("cursorTopSelect");
-        } else {
-            executeCommand("cursorTop");
+    if (lastKey === "h") {
+        const callback = hKeymap.get(event.text);
+        if (callback) {
+            callback();
         }
-    } else if (event.text === "6") {
-    } else if (event.text === "7") {
-        executeCommand("cursorUndo");
-    } else if (event.text === "8") {
-        if (selecting) {
-            executeCommand("cursorBottomSelect");
-        } else {
-            executeCommand("cursorBottom");
+    } else {
+        const callback = keymap.get(event.text);
+        if (callback) {
+            callback();
         }
-    } else if (event.text === "9") {
-    } else if (event.text === "0") {
-        executeCommand("editor.action.marker.nextInFiles");
-    } else if (event.text === ")") {
-        executeCommand("editor.action.marker.prevInFiles");
-    } else if (event.text === "-") {
-    } else if (event.text === "=") {
-
-    } else if (event.text === "q") {
-        executeCommand("tslint.fixAllProblems");
-    } else if (event.text === "Q") {
-        executeCommand("editor.action.formatDocument");
-    } else if (event.text === "w") {
-        if (selecting) {
-            executeCommand("editor.action.clipboardCutAction");
-        } else {
-            executeCommand("cursorLineStart")
-                .then(() => executeCommand("editor.action.copyLinesDownAction"))
-                .then(() => executeCommand("editor.action.clipboardCutAction"));
-        }
-    } else if (event.text === "e") {
-        executeCommand("deleteLeft");
-    } else if (event.text === "r") {
-        openLine();
-    } else if (event.text === "t") {
-        selecting = true;
-    } else if (event.text === "y") {
-    } else if (event.text === "u") {
-        executeCommand("cursorPageDown");
-    } else if (event.text === "i") {
-        executeCommand("cursorPageUp");
-    } else if (event.text === "o") {
-        executeCommand("cursorLineStart");
-    } else if (event.text === "O") {
-        executeCommand("cursorHome");
-    } else if (event.text === "p") {
-        executeCommand("cursorLineEnd");
-    } else if (event.text === "[") {
-        executeCommand("workbench.action.showCommands");
-    } else if (event.text === "]") {
-    } else if (event.text === "\\") {
-
-    } else if (event.text === "a") {
-        executeCommand("editor.action.clipboardCopyAction");
-    } else if (event.text === "s") {
-        executeCommand("editor.action.clipboardPasteAction");
-    } else if (event.text === "d") {
-        executeCommand("deleteWordLeft");
-    } else if (event.text === "f") {
-        enterInsert();
-    } else if (event.text === "g") {
-    } else if (event.text === "j") {
-        executeCommand("cursorDown");
-    } else if (event.text === "k") {
-        executeCommand("cursorUp");
-    } else if (event.text === "l") {
-        executeCommand("cursorLeft");
-    } else if (event.text === ";") {
-        executeCommand("cursorRight");
-    } else if (event.text === "'") {
-        executeCommand("editor.action.commentLine");
-
-    } else if (event.text === "z") {
-    } else if (event.text === "x") {
-    } else if (event.text === "c") {
-    } else if (event.text === "v") {
-        executeCommand("actions.find");
-    } else if (event.text === "b") {
-    } else if (event.text === "n") {
-    } else if (event.text === "m") {
-        executeCommand("cursorWordStartLeft");
-    } else if (event.text === ",") {
-        executeCommand("cursorWordEndRight");
-    } else if (event.text === "/") {
-        executeCommand("undo");
-    } else if (event.text === "?") {
-        executeCommand("redo");
-
-    } else if (event.text === " ") {
-        executeCommand("workbench.action.quickOpen");
-
-    } else if (event.text === "") {
-        executeCommand("editor.action.goToDeclaration");
-    } else if (event.text === "") {
-        executeCommand("workbench.action.reloadWindow");
     }
-
     lastKey = event.text;
 }
 
