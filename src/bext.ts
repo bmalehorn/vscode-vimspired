@@ -80,8 +80,7 @@ keymap.set("9", undefined);
 keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
 keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
 keymap.set("-", undefined);
-keymap.set("=", undefined
-);
+keymap.set("=", undefined);
 keymap.set("q", () => executeCommand("tslint.fixAllProblems"));
 keymap.set("Q", () => executeCommand("editor.action.formatDocument"));
 keymap.set("w", () => {
@@ -90,7 +89,7 @@ keymap.set("w", () => {
             .then(() => setSelecting(false));
     } else {
         return executeCommand("cursorLineStart")
-            .then(() => executeCommand("editor.action.copyLinesDownAction"))
+            .then(() => executeCommand("cursorDownSelect"))
             .then(() => executeCommand("editor.action.clipboardCutAction"))
             .then(() => setSelecting(false));
     }
@@ -127,7 +126,7 @@ keymap.set("a", () => {
             .then(() => setSelecting(false));
     } else {
         return executeCommand("cursorLineStart")
-            .then(() => executeCommand("editor.action.copyLinesDownAction"))
+            .then(() => executeCommand("cursorDownSelect"))
             .then(() => executeCommand("editor.action.clipboardCopyAction"))
             .then(() => setSelecting(false));
     }
@@ -159,6 +158,7 @@ keymap.set(" ", () => executeCommand("workbench.action.quickOpen"));
 const hKeymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
 hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
 hKeymap.set("x", () => executeCommand("workbench.action.closeAllEditors"));
+hKeymap.set("r", () => executeCommand("workbench.action.reloadWindow"));
 
 //     executeCommand("editor.action.goToDeclaration");
 //     executeCommand("workbench.action.reloadWindow");
