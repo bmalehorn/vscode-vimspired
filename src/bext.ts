@@ -8,10 +8,9 @@ let typeSubscription: vscode.Disposable | undefined;
 let lastKey: string | undefined;
 let selecting: boolean = false;
 
-async function setSelecting(newSelecting: boolean): Promise<undefined> {
-    await executeCommand("cancelSelection");
+async function setSelecting(newSelecting: boolean): Promise<void> {
+    // await executeCommand("cancelSelection");
     selecting = newSelecting;
-    return undefined;
 }
 
 // this method is called when your extension is activated
@@ -60,12 +59,8 @@ export function deactivate() {
     enterInsert();
 }
 
-interface IEvent {
-    text: string;
-}
-
-const keymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
-keymap.set("`", async () => undefined);
+const keymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
+keymap.set("`", undefined);
 keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
 keymap.set("2", () => executeCommand("editor.action.goToDeclaration"));
 keymap.set("3", () => executeCommand("editor.action.openLink"));
@@ -78,7 +73,6 @@ keymap.set("9", async () => {
     await executeCommand("cursorHome");
     await executeCommand("deleteAllLeft");
     await executeCommand("deleteLeft");
-    return undefined;
 });
 keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
 keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
@@ -93,18 +87,13 @@ keymap.set("w", async () => {
     }
     await executeCommand("editor.action.clipboardCutAction");
     await setSelecting(false);
-    return undefined;
 });
 keymap.set("e", () => executeCommand("deleteLeft"));
 keymap.set("r", async () => {
     await executeCommand("editor.action.insertLineAfter");
     enterInsert();
-    return undefined;
 });
-keymap.set("t", () => {
-    setSelecting(!selecting);
-    return Promise.resolve(undefined);
-});
+keymap.set("t", () => setSelecting(!selecting));
 keymap.set("y", undefined);
 keymap.set("u", () => executeCommand(selecting ? "cursorPageDownSelect" : "cursorPageDown"));
 keymap.set("i", () => executeCommand(selecting ? "cursorPageUpSelect" : "cursorPageUp"));
@@ -116,7 +105,6 @@ keymap.set("o", async () => {
     } else {
         await executeCommand("cursorLineStart");
     }
-    return undefined;
 });
 keymap.set("O", () => executeCommand(selecting ? "cursorHomeSelect" : "cursorHome"));
 keymap.set("p", () => executeCommand(selecting ? "cursorEndSelect" : "cursorLineEnd"));
@@ -130,14 +118,10 @@ keymap.set("a", async () => {
     }
     await executeCommand("editor.action.clipboardCopyAction");
     await setSelecting(false);
-    return undefined;
 });
 keymap.set("s", () => executeCommand("editor.action.clipboardPasteAction"));
 keymap.set("d", () => executeCommand("deleteWordLeft"));
-keymap.set("f", () => {
-    enterInsert();
-    return Promise.resolve(undefined);
-});
+keymap.set("f", async () => enterInsert());
 keymap.set("g", undefined);
 keymap.set("j", () => executeCommand(selecting ? "cursorDownSelect" : "cursorDown"));
 keymap.set("k", () => executeCommand(selecting ? "cursorUpSelect" : "cursorUp"));
@@ -157,7 +141,7 @@ keymap.set("/", () => executeCommand("undo"));
 keymap.set("?", () => executeCommand("redo"));
 keymap.set(" ", () => executeCommand("workbench.action.quickOpen"));
 
-const hKeymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
+const hKeymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
 hKeymap.set("r", () => executeCommand("workbench.action.reloadWindow"));
 hKeymap.set("y", () => executeCommand("rewrap.rewrapComment"));
 hKeymap.set("f", () => executeCommand("copyFilePath"));
@@ -169,7 +153,7 @@ hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
 // todo:
 // editor.action.showHover
 
-function onType(event: IEvent) {
+function onType(event: { text: string }) {
 
     if (lastKey === "h") {
         const callback = hKeymap.get(event.text);
