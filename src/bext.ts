@@ -8,12 +8,10 @@ let typeSubscription: vscode.Disposable | undefined;
 let lastKey: string | undefined;
 let selecting: boolean = false;
 
-function setSelecting(newSelecting: boolean): Thenable<{} | undefined> {
-    return executeCommand("workbench.action.terminal.clearSelection")
-        .then(() => {
-            selecting = newSelecting;
-            return Promise.resolve(undefined);
-        });
+async function setSelecting(newSelecting: boolean): Promise<undefined> {
+    await executeCommand("cancelSelection");
+    selecting = newSelecting;
+    return undefined;
 }
 
 // this method is called when your extension is activated
@@ -22,7 +20,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand("bext.sayHello", sayHello));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", enterNormal));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", enterInsert));
-    console.log("@@@ activate!!!");
     enterNormal();
 }
 
@@ -53,6 +50,7 @@ function setNormal(normal: boolean) {
     editor.options.cursorStyle = normal ?
         vscode.TextEditorCursorStyle.Block :
         vscode.TextEditorCursorStyle.Underline;
+    // executeCommand("removeSecondaryCursors");
     executeCommand("setContext", "bext.normal", normal)
         .then(() => setSelecting(false));
 }
@@ -67,37 +65,41 @@ interface IEvent {
 }
 
 const keymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
-keymap.set("`", undefined);
+keymap.set("`", async () => undefined);
 keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
-keymap.set("2", undefined);
-keymap.set("3", undefined);
+keymap.set("2", () => executeCommand("editor.action.goToDeclaration"));
+keymap.set("3", () => executeCommand("editor.action.openLink"));
 keymap.set("4", undefined);
 keymap.set("5", () => executeCommand(selecting ? "cursorTopSelect" : "cursorTop"));
 keymap.set("6", undefined);
 keymap.set("7", () => executeCommand("cursorUndo"));
 keymap.set("8", () => executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom"));
-keymap.set("9", undefined);
+keymap.set("9", async () => {
+    await executeCommand("cursorHome");
+    await executeCommand("deleteAllLeft");
+    await executeCommand("deleteLeft");
+    return undefined;
+});
 keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
 keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
 keymap.set("-", undefined);
 keymap.set("=", undefined);
 keymap.set("q", () => executeCommand("tslint.fixAllProblems"));
 keymap.set("Q", () => executeCommand("editor.action.formatDocument"));
-keymap.set("w", () => {
-    if (selecting) {
-        return executeCommand("editor.action.clipboardCutAction")
-            .then(() => setSelecting(false));
-    } else {
-        return executeCommand("cursorLineStart")
-            .then(() => executeCommand("cursorDownSelect"))
-            .then(() => executeCommand("editor.action.clipboardCutAction"))
-            .then(() => setSelecting(false));
+keymap.set("w", async () => {
+    if (!selecting) {
+        await executeCommand("cursorLineStart");
+        await executeCommand("cursorDownSelect");
     }
+    await executeCommand("editor.action.clipboardCutAction");
+    await setSelecting(false);
+    return undefined;
 });
 keymap.set("e", () => executeCommand("deleteLeft"));
-keymap.set("r", () => {
-    openLine();
-    return Promise.resolve(undefined);
+keymap.set("r", async () => {
+    await executeCommand("editor.action.insertLineAfter");
+    enterInsert();
+    return undefined;
 });
 keymap.set("t", () => {
     setSelecting(!selecting);
@@ -106,30 +108,29 @@ keymap.set("t", () => {
 keymap.set("y", undefined);
 keymap.set("u", () => executeCommand(selecting ? "cursorPageDownSelect" : "cursorPageDown"));
 keymap.set("i", () => executeCommand(selecting ? "cursorPageUpSelect" : "cursorPageUp"));
-keymap.set("o", () => {
+keymap.set("o", async () => {
     // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
     if (selecting) {
-        return executeCommand("cursorHomeSelect")
-            .then(() => executeCommand("cursorHomeSelect"));
+        await executeCommand("cursorHomeSelect");
+        await executeCommand("cursorHomeSelect");
     } else {
-        return executeCommand("cursorLineStart");
+        await executeCommand("cursorLineStart");
     }
+    return undefined;
 });
 keymap.set("O", () => executeCommand(selecting ? "cursorHomeSelect" : "cursorHome"));
-keymap.set("p", () => executeCommand(selecting ? "cursorLineEndSelect" : "cursorLineEnd"));
+keymap.set("p", () => executeCommand(selecting ? "cursorEndSelect" : "cursorLineEnd"));
 keymap.set("[", () => executeCommand("workbench.action.showCommands"));
 keymap.set("]", undefined);
 keymap.set("\\", undefined);
-keymap.set("a", () => {
-    if (selecting) {
-        return executeCommand("editor.action.clipboardCopyAction")
-            .then(() => setSelecting(false));
-    } else {
-        return executeCommand("cursorLineStart")
-            .then(() => executeCommand("cursorDownSelect"))
-            .then(() => executeCommand("editor.action.clipboardCopyAction"))
-            .then(() => setSelecting(false));
+keymap.set("a", async () => {
+    if (!selecting) {
+        await executeCommand("cursorLineStart");
+        await executeCommand("cursorDownSelect");
     }
+    await executeCommand("editor.action.clipboardCopyAction");
+    await setSelecting(false);
+    return undefined;
 });
 keymap.set("s", () => executeCommand("editor.action.clipboardPasteAction"));
 keymap.set("d", () => executeCommand("deleteWordLeft"));
@@ -144,24 +145,29 @@ keymap.set("l", () => executeCommand(selecting ? "cursorLeftSelect" : "cursorLef
 keymap.set(";", () => executeCommand(selecting ? "cursorRightSelect" : "cursorRight"));
 keymap.set("'", () => executeCommand("editor.action.commentLine"));
 keymap.set("z", undefined);
-keymap.set("x", undefined);
-keymap.set("c", undefined);
+keymap.set("x", () => executeCommand("copy-word.copy"));
+keymap.set("c", () => executeCommand("editor.action.startFindReplaceAction"));
 keymap.set("v", () => executeCommand("actions.find"));
 keymap.set("b", undefined);
 keymap.set("n", undefined);
 keymap.set("m", () => executeCommand(selecting ? "cursorWordStartLeftSelect" : "cursorWordStartLeft"));
 keymap.set(",", () => executeCommand(selecting ? "cursorWordEndRightSelect" : "cursorWordEndRight"));
+keymap.set(".", () => executeCommand("workbench.action.focusNextGroup"));
 keymap.set("/", () => executeCommand("undo"));
 keymap.set("?", () => executeCommand("redo"));
 keymap.set(" ", () => executeCommand("workbench.action.quickOpen"));
 
 const hKeymap: Map<string, (() => Thenable<{} | undefined>) | undefined> = new Map();
-hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
-hKeymap.set("x", () => executeCommand("workbench.action.closeAllEditors"));
 hKeymap.set("r", () => executeCommand("workbench.action.reloadWindow"));
+hKeymap.set("y", () => executeCommand("rewrap.rewrapComment"));
+hKeymap.set("f", () => executeCommand("copyFilePath"));
+hKeymap.set("p", () => executeCommand("workbench.action.gotoLine"));
+hKeymap.set("x", () => executeCommand("workbench.action.closeEditorsInOtherGroups"));
+hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
 
-//     executeCommand("editor.action.goToDeclaration");
-//     executeCommand("workbench.action.reloadWindow");
+/////////////////
+// todo:
+// editor.action.showHover
 
 function onType(event: IEvent) {
 
@@ -178,18 +184,3 @@ function onType(event: IEvent) {
     }
     lastKey = event.text;
 }
-
-
-function openLine() {
-    // TODO: go to end of line, *then* newline
-    // TODO: indent after newline
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        return;
-    }
-    editor.edit((editBuilder) => {
-        editBuilder.insert(editor.selection.start, "\n");
-    });
-    enterInsert();
-}
-
