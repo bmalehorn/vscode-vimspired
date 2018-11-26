@@ -2,6 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { Range, Selection, TextEditorRevealType } from 'vscode';
 const { executeCommand } = vscode.commands;
 
 let typeSubscription: vscode.Disposable | undefined;
@@ -9,7 +10,15 @@ let lastKey: string | undefined;
 let selecting: boolean = false;
 
 async function setSelecting(newSelecting: boolean): Promise<void> {
-    // await executeCommand("cancelSelection");
+    // un-select any existing highlighting
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    editor.selections = editor.selections.map((selection) =>
+        new Selection(selection.active, selection.active)
+    );
+
     selecting = newSelecting;
 }
 
@@ -59,6 +68,59 @@ export function deactivate() {
     enterInsert();
 }
 
+async function moveDown(lines: number, buffer: number = 1) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    const { start, end } = editor.visibleRanges[0];
+    const newRange = new Range(
+        start.with(Math.max(start.line + lines, 0)),
+        end.with(Math.max(end.line + lines, 0)),
+    );
+    editor.revealRange(new Selection(newRange.start, newRange.end));
+
+    // put active inside new revealed range
+    if (editor.selection.active.compareTo(newRange.start) < 0) {
+        const newPosition = newRange.start.with(newRange.start.line + buffer, 0);
+        editor.selection = new Selection(
+            selecting ? editor.selection.anchor : newPosition,
+            newPosition,
+        );
+    }
+    if (editor.selection.active.compareTo(newRange.end) > 0) {
+        const newPosition = newRange.end.with(newRange.end.line - buffer, 0);
+        editor.selection = new Selection(
+            selecting ? editor.selection.anchor : newPosition,
+            newPosition,
+        );
+    }
+}
+
+async function swapActiveAndAnchor() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    editor.selections = editor.selections.map(({ anchor, active }) =>
+        new Selection(active, anchor)
+    );
+    editor.revealRange(
+        new Selection(editor.selection.active, editor.selection.active),
+        TextEditorRevealType.Default,
+    );
+}
+
+async function saveSelections(callback: () => Thenable<void>) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    const selections = editor.selections;
+    await callback();
+    editor.selections = selections;
+}
+
 const keymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
 keymap.set("`", undefined);
 keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
@@ -67,7 +129,7 @@ keymap.set("3", () => executeCommand("editor.action.openLink"));
 keymap.set("4", undefined);
 keymap.set("5", () => executeCommand(selecting ? "cursorTopSelect" : "cursorTop"));
 keymap.set("6", undefined);
-keymap.set("7", () => executeCommand("cursorUndo"));
+keymap.set("7", () => executeCommand("workbench.action.navigateBack"));
 keymap.set("8", () => executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom"));
 keymap.set("9", async () => {
     await executeCommand("cursorHome");
@@ -77,16 +139,19 @@ keymap.set("9", async () => {
 keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
 keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
 keymap.set("-", undefined);
-keymap.set("=", undefined);
+keymap.set("=", () => swapActiveAndAnchor());
 keymap.set("q", () => executeCommand("tslint.fixAllProblems"));
 keymap.set("Q", () => executeCommand("editor.action.formatDocument"));
 keymap.set("w", async () => {
     if (!selecting) {
         await executeCommand("cursorLineStart");
-        await executeCommand("cursorDownSelect");
+        await executeCommand("cursorEndSelect");
+        await executeCommand("cursorEndSelect");
+        await executeCommand("cursorRightSelect");
     }
     await executeCommand("editor.action.clipboardCutAction");
-    await setSelecting(false);
+    // await setSelecting(false);
+    selecting = false;
 });
 keymap.set("e", () => executeCommand("deleteLeft"));
 keymap.set("r", async () => {
@@ -94,9 +159,10 @@ keymap.set("r", async () => {
     enterInsert();
 });
 keymap.set("t", () => setSelecting(!selecting));
-keymap.set("y", undefined);
-keymap.set("u", () => executeCommand(selecting ? "cursorPageDownSelect" : "cursorPageDown"));
-keymap.set("i", () => executeCommand(selecting ? "cursorPageUpSelect" : "cursorPageUp"));
+keymap.set("y", () => executeCommand("editor.action.wordHighlight.next"));
+keymap.set("Y", () => executeCommand("editor.action.wordHighlight.prev"));
+keymap.set("u", () => moveDown(10));
+keymap.set("i", () => moveDown(-10));
 keymap.set("o", async () => {
     // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
     if (selecting) {
@@ -114,7 +180,9 @@ keymap.set("\\", undefined);
 keymap.set("a", async () => {
     if (!selecting) {
         await executeCommand("cursorLineStart");
-        await executeCommand("cursorDownSelect");
+        await executeCommand("cursorEndSelect");
+        await executeCommand("cursorEndSelect");
+        await executeCommand("cursorRightSelect");
     }
     await executeCommand("editor.action.clipboardCopyAction");
     await setSelecting(false);
@@ -129,7 +197,10 @@ keymap.set("l", () => executeCommand(selecting ? "cursorLeftSelect" : "cursorLef
 keymap.set(";", () => executeCommand(selecting ? "cursorRightSelect" : "cursorRight"));
 keymap.set("'", () => executeCommand("editor.action.commentLine"));
 keymap.set("z", undefined);
-keymap.set("x", () => executeCommand("copy-word.copy"));
+keymap.set("x", () => saveSelections(async () => {
+    await executeCommand("editor.action.addSelectionToNextFindMatch");
+    await executeCommand("editor.action.clipboardCopyAction");
+}));
 keymap.set("c", () => executeCommand("editor.action.startFindReplaceAction"));
 keymap.set("v", () => executeCommand("actions.find"));
 keymap.set("b", undefined);
