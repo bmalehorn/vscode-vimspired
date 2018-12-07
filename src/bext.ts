@@ -125,6 +125,7 @@ const keymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
 keymap.set("`", undefined);
 keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
 keymap.set("2", () => executeCommand("editor.action.goToDeclaration"));
+keymap.set("@", () => executeCommand("editor.action.referenceSearch.trigger"));
 keymap.set("3", () => executeCommand("editor.action.openLink"));
 keymap.set("4", undefined);
 keymap.set("5", () => executeCommand(selecting ? "cursorTopSelect" : "cursorTop"));
@@ -132,9 +133,9 @@ keymap.set("6", undefined);
 keymap.set("7", () => executeCommand("workbench.action.navigateBack"));
 keymap.set("8", () => executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom"));
 keymap.set("9", async () => {
+    await executeCommand("cursorLineEnd");
     await executeCommand("cursorHome");
-    await executeCommand("deleteAllLeft");
-    await executeCommand("deleteLeft");
+    await executeCommand("extension.smartBackspace");
 });
 keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
 keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
@@ -173,7 +174,14 @@ keymap.set("o", async () => {
     }
 });
 keymap.set("O", () => executeCommand(selecting ? "cursorHomeSelect" : "cursorHome"));
-keymap.set("p", () => executeCommand(selecting ? "cursorEndSelect" : "cursorLineEnd"));
+keymap.set("p", async () => {
+    if (selecting) {
+        await executeCommand("cursorEndSelect");
+        await executeCommand("cursorEndSelect");
+    } else {
+        await executeCommand("cursorLineEnd");
+    }
+});
 keymap.set("[", () => executeCommand("workbench.action.showCommands"));
 keymap.set("]", undefined);
 keymap.set("\\", undefined);
@@ -215,14 +223,26 @@ keymap.set(" ", () => executeCommand("workbench.action.quickOpen"));
 const hKeymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
 hKeymap.set("r", () => executeCommand("workbench.action.reloadWindow"));
 hKeymap.set("y", () => executeCommand("rewrap.rewrapComment"));
+hKeymap.set("u", () => executeCommand("insert-unicode.insertText"));
 hKeymap.set("f", () => executeCommand("copyFilePath"));
 hKeymap.set("p", () => executeCommand("workbench.action.gotoLine"));
 hKeymap.set("x", () => executeCommand("workbench.action.closeEditorsInOtherGroups"));
+hKeymap.set("b", () => executeCommand("gitlens.toggleFileBlame"));
 hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
+hKeymap.set("z", async () => {
+    await executeCommand("workbench.action.focusSecondEditorGroup");
+    await executeCommand("workbench.action.quickOpen");
+});
 
 /////////////////
-// todo:
+//
+// to bind:
 // editor.action.showHover
+//
+// todo:
+// find file at point
+// reduce whitespace. Or, hungry delete?
+// make "w" not async (holding "w" = race conditions)
 
 function onType(event: { text: string }) {
 
