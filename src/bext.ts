@@ -240,9 +240,12 @@ hKeymap.set("z", async () => {
 // editor.action.showHover
 //
 // todo:
+// `selecting() = selecting || point === mark`
 // find file at point
 // reduce whitespace. Or, hungry delete?
 // make "w" not async (holding "w" = race conditions)
+// previous / next terminal
+// jump into / out of cmd-j menu
 
 function onType(event: { text: string }) {
 
