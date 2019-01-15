@@ -125,7 +125,7 @@ const keymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
 keymap.set("`", undefined);
 keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
 keymap.set("2", () => executeCommand("editor.action.goToDeclaration"));
-keymap.set("@", () => executeCommand("editor.action.referenceSearch.trigger"));
+keymap.set("@", () => executeCommand("references-view.find"));
 keymap.set("3", () => executeCommand("editor.action.openLink"));
 keymap.set("4", undefined);
 keymap.set("5", () => executeCommand(selecting ? "cursorTopSelect" : "cursorTop"));
@@ -134,6 +134,7 @@ keymap.set("7", () => executeCommand("workbench.action.navigateBack"));
 keymap.set("8", () => executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom"));
 keymap.set("9", async () => {
     await executeCommand("cursorLineEnd");
+    await executeCommand("cursorHome");
     await executeCommand("cursorHome");
     await executeCommand("extension.smartBackspace");
 });
@@ -242,10 +243,10 @@ hKeymap.set("z", async () => {
 // todo:
 // `selecting() = selecting || point === mark`
 // find file at point
-// reduce whitespace. Or, hungry delete?
 // make "w" not async (holding "w" = race conditions)
 // previous / next terminal
 // jump into / out of cmd-j menu
+// fix merge line upward
 
 function onType(event: { text: string }) {
 
