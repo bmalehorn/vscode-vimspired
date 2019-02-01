@@ -234,6 +234,8 @@ hKeymap.set("z", async () => {
     await executeCommand("workbench.action.focusSecondEditorGroup");
     await executeCommand("workbench.action.quickOpen");
 });
+hKeymap.set("s", () => executeCommand("editor.action.sortLinesAscending"));
+hKeymap.set("n", () => executeCommand("editor.action.rename"));
 
 /////////////////
 //
