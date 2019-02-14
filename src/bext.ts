@@ -142,8 +142,8 @@ keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
 keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
 keymap.set("-", undefined);
 keymap.set("=", () => swapActiveAndAnchor());
-keymap.set("q", () => executeCommand("tslint.fixAllProblems"));
-keymap.set("Q", () => executeCommand("editor.action.formatDocument"));
+keymap.set("q", () => executeCommand("editor.action.formatDocument"));
+keymap.set("Q", () => executeCommand("tslint.fixAllProblems"));
 keymap.set("w", async () => {
     if (!selecting) {
         await executeCommand("cursorLineStart");
