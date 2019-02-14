@@ -10,7 +10,7 @@ to share with myself.
 Lots of people use vim.
 Modal editing is a good idea, and vim has OK keybindings.
 
-But why is `hjkl` sacred? Why not `jkl;`?
+But why does it need to be `hjkl`? Why not `jkl;`?
 
 Why `0$`? Why not `op`?
 

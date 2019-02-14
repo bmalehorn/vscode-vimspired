@@ -5,7 +5,10 @@
     "version": "1.0.0",
     "publisher": "bmalehorn",
     "engines": {
-        "vscode": "^1.22.0"
+        "vscode": "^1.28.0"
+    },
+    "repository": {
+        "url": "https://github.com/bmalehorn/vscode-bext"
     },
     "categories": [
         "Other"
@@ -46,7 +49,7 @@
     },
     "devDependencies": {
         "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
+        "vscode": "^1.1.29",
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
