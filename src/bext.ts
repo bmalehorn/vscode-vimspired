@@ -1,6 +1,5 @@
 'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+
 import * as vscode from 'vscode';
 import { Range, Selection, TextEditorRevealType } from 'vscode';
 const { executeCommand } = vscode.commands;
@@ -25,14 +24,9 @@ async function setSelecting(newSelecting: boolean): Promise<void> {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(vscode.commands.registerCommand("bext.sayHello", sayHello));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", enterNormal));
     context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", enterInsert));
     enterNormal();
-}
-
-function sayHello() {
-    vscode.window.showInformationMessage("Hello World!");
 }
 
 function enterNormal() {

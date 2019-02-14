@@ -2,7 +2,7 @@
     "name": "bext",
     "displayName": "bext",
     "description": "Brian's EXTension",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "publisher": "bmalehorn",
     "engines": {
         "vscode": "^1.28.0"
@@ -19,10 +19,6 @@
     "main": "./out/bext",
     "contributes": {
         "commands": [
-            {
-                "command": "bext.sayHello",
-                "title": "Hello World"
-            },
             {
                 "command": "bext.enterNormal",
                 "title": "Bext: normal mode"
@@ -47,8 +43,13 @@
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
+    "extensionDependencies": [
+        "stkb.rewrap",
+        "brunnerh.insert-unicode",
+        "eamodio.gitlens"
+    ],
     "devDependencies": {
-        "typescript": "^2.6.1",
+        "typescript": "^3.2.4",
         "vscode": "^1.1.29",
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
