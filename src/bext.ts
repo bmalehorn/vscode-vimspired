@@ -273,7 +273,6 @@ hKeymap.set("n", () => executeCommand("editor.action.rename"));
 // - fix merge line upward
 
 async function onType(event: { text: string }): Promise<void> {
-  console.log("before", event.text, "getSelecting() =", getSelecting());
   adjustSelecting();
   if (lastKey === "h") {
     const callback = hKeymap.get(event.text);
@@ -288,5 +287,4 @@ async function onType(event: { text: string }): Promise<void> {
   }
   adjustSelecting();
   lastKey = event.text;
-  console.log("after", event.text, "getSelecting() =", getSelecting());
 }

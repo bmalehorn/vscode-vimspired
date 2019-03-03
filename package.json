@@ -2,7 +2,7 @@
   "name": "bext",
   "displayName": "bext",
   "description": "Brian's EXTension",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
