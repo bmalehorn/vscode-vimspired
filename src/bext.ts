@@ -1,6 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
+// tslint:disable-next-line
 import { Range, Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
 
@@ -263,14 +264,11 @@ hKeymap.set("n", () => executeCommand("editor.action.rename"));
 /////////////////
 //
 // to bind:
-// editor.action.showHover
 //
 // todo:
 // - find file at point
-// - make "w" not async (holding "w" = race conditions)
 // - previous / next terminal
 // - jump into / out of cmd-j menu
-// - fix merge line upward
 
 async function onType(event: { text: string }): Promise<void> {
   adjustSelecting();
