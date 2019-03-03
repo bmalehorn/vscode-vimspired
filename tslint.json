@@ -1,118 +1,70 @@
 {
-	"defaultSeverity": "error",
-	"extends": [
-		"tslint:recommended",
-		"tslint-consistent-codestyle",
-		"tslint-eslint-rules",
-		"tslint-react"
-	],
-	"rules": {
-		"array-bracket-spacing": [
-			true,
-			"never"
-		],
-		"arrow-parens": false,
-		"array-type": [
-			true,
-			"generic"
-		],
-		"block-spacing": true,
-		"brace-style": [
-			true,
-			"1tbs"
-		],
-		"comment-format": [
-			true,
-			"check-space"
-		],
-		"interface-over-type-literal": false,
-		"jsx-no-multiline-js": false,
-		"max-line-length": false,
-		"member-access": [
-			true,
-			"no-public"
-		],
-		"no-collapsible-if": true,
-		"no-constant-condition": true,
-		"no-duplicate-case": true,
-		"no-empty": false,
-		"no-empty-character-class": true,
-		"no-ex-assign": true,
-		"no-extra-boolean-cast": true,
-		"no-extra-semi": true,
-		"no-inner-declarations": true,
-		"no-invalid-regexp": true,
-		"no-irregular-whitespace": true,
-		"no-return-undefined": true,
-		"no-sparse-arrays": true,
-		"no-unused": [
-			true,
-			"ignore-imports"
-		],
-		"no-unused-expression": [
-			true,
-			"allow-fast-null-checks"
-		],
-		"no-unused-variable": true,
-		"object-curly-spacing": true,
-		"object-literal-key-quotes": [
-			true,
-			"as-needed"
-		],
-		"object-literal-sort-keys": false,
-		"quotemark": [
-			true,
-			"single",
-			"jsx-double",
-			"avoid-escape"
-		],
-		"semicolon": [
-			true,
-			"always",
-			"ignore-interfaces"
-		],
-		"switch-default": true,
-		"ter-arrow-spacing": true,
-		"ter-func-call-spacing": true,
-		"ter-indent": [
-			true,
-			2,
-			{
-				"SwitchCase": 1
-			}
-		],
-		"ter-max-len": [
-			true,
-			100,
-			2,
-			{
-				"ignoreUrls": true,
-				"ignoreRegExpLiterals": true
-			}
-		],
-		"ter-prefer-arrow-callback": true,
-		"triple-equals": true,
-		"valid-typeof": true,
-		"variable-name": [
-			true,
-			"ban-keywords",
-			"check-format",
-			"allow-pascal-case"
-		]
-	},
-	"bmalehorn_unused_old": {
-		"rules": {
-			"no-string-throw": true,
-			"no-unused-expression": true,
-			"no-duplicate-variable": true,
-			"curly": true,
-			"class-name": true,
-			"semicolon": [
-				true,
-				"always"
-			],
-			"triple-equals": true
-		},
-		"defaultSeverity": "warning"
-	}
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended",
+        "tslint-consistent-codestyle",
+        "tslint-eslint-rules",
+        "tslint-react"
+    ],
+    "rules": {
+        "array-bracket-spacing": [true, "never"],
+        "arrow-parens": false,
+        "array-type": [true, "generic"],
+        "block-spacing": true,
+        "brace-style": [true, "1tbs"],
+        "comment-format": [true, "check-space"],
+        "interface-over-type-literal": false,
+        "jsx-no-multiline-js": false,
+        "max-line-length": false,
+        "member-access": [true, "no-public"],
+        "no-collapsible-if": true,
+        "no-constant-condition": true,
+        "no-duplicate-case": true,
+        "no-empty": false,
+        "no-empty-character-class": true,
+        "no-ex-assign": true,
+        "no-extra-boolean-cast": true,
+        "no-extra-semi": true,
+        "no-inner-declarations": true,
+        "no-invalid-regexp": true,
+        "no-irregular-whitespace": true,
+        "no-return-undefined": true,
+        "no-sparse-arrays": true,
+        "no-unused": [true, "ignore-imports"],
+        "no-unused-expression": [true, "allow-fast-null-checks"],
+        "no-unused-variable": true,
+        "object-curly-spacing": true,
+        "object-literal-key-quotes": [true, "as-needed"],
+        "object-literal-sort-keys": false,
+        "quotemark": [true, "single", "jsx-double", "avoid-escape"],
+        "semicolon": [true, "always", "ignore-interfaces"],
+        "switch-default": true,
+        "ter-arrow-spacing": true,
+        "ter-func-call-spacing": true,
+        "ter-indent": [
+            true,
+            2,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "ter-max-len": [
+            true,
+            100,
+            2,
+            {
+                "ignoreUrls": true,
+                "ignoreRegExpLiterals": true
+            }
+        ],
+        "ter-prefer-arrow-callback": true,
+        "triple-equals": true,
+        "valid-typeof": true,
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-pascal-case"
+        ]
+    }
 }

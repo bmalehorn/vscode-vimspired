@@ -49,15 +49,17 @@
         "eamodio.gitlens"
     ],
     "devDependencies": {
-        "typescript": "^3.2.4",
-        "vscode": "^1.1.29",
-        "tslint": "^5.8.0",
+        "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "prettier": "^1.16.4",
+        "tslint": "^5.8.0",
+        "typescript": "^3.2.4",
+        "vscode": "^1.1.29"
     },
     "__metadata": {
         "id": "20b6ea6f-43c5-4004-b393-c237975cbd76",
         "publisherDisplayName": "Brian Malehorn",
         "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
-    }
+    },
+    "dependencies": {}
 }

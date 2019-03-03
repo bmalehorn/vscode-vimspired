@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import * as vscode from 'vscode';
-import { Range, Selection, TextEditorRevealType } from 'vscode';
+import * as vscode from "vscode";
+import { Range, Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
 
 let typeSubscription: vscode.Disposable | undefined;
@@ -14,8 +14,8 @@ async function setSelecting(newSelecting: boolean): Promise<void> {
     if (!editor) {
         return;
     }
-    editor.selections = editor.selections.map((selection) =>
-        new Selection(selection.active, selection.active)
+    editor.selections = editor.selections.map(
+        selection => new Selection(selection.active, selection.active)
     );
 
     selecting = newSelecting;
@@ -24,8 +24,12 @@ async function setSelecting(newSelecting: boolean): Promise<void> {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(vscode.commands.registerCommand("bext.enterNormal", enterNormal));
-    context.subscriptions.push(vscode.commands.registerCommand("bext.enterInsert", enterInsert));
+    context.subscriptions.push(
+        vscode.commands.registerCommand("bext.enterNormal", enterNormal)
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand("bext.enterInsert", enterInsert)
+    );
     enterNormal();
 }
 
@@ -49,12 +53,13 @@ function setNormal(normal: boolean) {
     if (!editor) {
         return;
     }
-    editor.options.cursorStyle = normal ?
-        vscode.TextEditorCursorStyle.Block :
-        vscode.TextEditorCursorStyle.Underline;
+    editor.options.cursorStyle = normal
+        ? vscode.TextEditorCursorStyle.Block
+        : vscode.TextEditorCursorStyle.Underline;
     // executeCommand("removeSecondaryCursors");
-    executeCommand("setContext", "bext.normal", normal)
-        .then(() => setSelecting(false));
+    executeCommand("setContext", "bext.normal", normal).then(() =>
+        setSelecting(false)
+    );
 }
 
 // this method is called when your extension is deactivated
@@ -70,23 +75,26 @@ async function moveDown(lines: number, buffer: number = 1) {
     const { start, end } = editor.visibleRanges[0];
     const newRange = new Range(
         start.with(Math.max(start.line + lines, 0)),
-        end.with(Math.max(end.line + lines, 0)),
+        end.with(Math.max(end.line + lines, 0))
     );
     editor.revealRange(new Selection(newRange.start, newRange.end));
 
     // put active inside new revealed range
     if (editor.selection.active.compareTo(newRange.start) < 0) {
-        const newPosition = newRange.start.with(newRange.start.line + buffer, 0);
+        const newPosition = newRange.start.with(
+            newRange.start.line + buffer,
+            0
+        );
         editor.selection = new Selection(
             selecting ? editor.selection.anchor : newPosition,
-            newPosition,
+            newPosition
         );
     }
     if (editor.selection.active.compareTo(newRange.end) > 0) {
         const newPosition = newRange.end.with(newRange.end.line - buffer, 0);
         editor.selection = new Selection(
             selecting ? editor.selection.anchor : newPosition,
-            newPosition,
+            newPosition
         );
     }
 }
@@ -96,12 +104,12 @@ async function swapActiveAndAnchor() {
     if (!editor) {
         return;
     }
-    editor.selections = editor.selections.map(({ anchor, active }) =>
-        new Selection(active, anchor)
+    editor.selections = editor.selections.map(
+        ({ anchor, active }) => new Selection(active, anchor)
     );
     editor.revealRange(
         new Selection(editor.selection.active, editor.selection.active),
-        TextEditorRevealType.Default,
+        TextEditorRevealType.Default
     );
 }
 
@@ -122,10 +130,14 @@ keymap.set("2", () => executeCommand("editor.action.goToDeclaration"));
 keymap.set("@", () => executeCommand("references-view.find"));
 keymap.set("3", () => executeCommand("editor.action.openLink"));
 keymap.set("4", undefined);
-keymap.set("5", () => executeCommand(selecting ? "cursorTopSelect" : "cursorTop"));
+keymap.set("5", () =>
+    executeCommand(selecting ? "cursorTopSelect" : "cursorTop")
+);
 keymap.set("6", undefined);
 keymap.set("7", () => executeCommand("workbench.action.navigateBack"));
-keymap.set("8", () => executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom"));
+keymap.set("8", () =>
+    executeCommand(selecting ? "cursorBottomSelect" : "cursorBottom")
+);
 keymap.set("9", async () => {
     await executeCommand("cursorLineEnd");
     await executeCommand("cursorHome");
@@ -168,7 +180,9 @@ keymap.set("o", async () => {
         await executeCommand("cursorLineStart");
     }
 });
-keymap.set("O", () => executeCommand(selecting ? "cursorHomeSelect" : "cursorHome"));
+keymap.set("O", () =>
+    executeCommand(selecting ? "cursorHomeSelect" : "cursorHome")
+);
 keymap.set("p", async () => {
     if (selecting) {
         await executeCommand("cursorEndSelect");
@@ -194,22 +208,40 @@ keymap.set("s", () => executeCommand("editor.action.clipboardPasteAction"));
 keymap.set("d", () => executeCommand("deleteWordLeft"));
 keymap.set("f", async () => enterInsert());
 keymap.set("g", undefined);
-keymap.set("j", () => executeCommand(selecting ? "cursorDownSelect" : "cursorDown"));
-keymap.set("k", () => executeCommand(selecting ? "cursorUpSelect" : "cursorUp"));
-keymap.set("l", () => executeCommand(selecting ? "cursorLeftSelect" : "cursorLeft"));
-keymap.set(";", () => executeCommand(selecting ? "cursorRightSelect" : "cursorRight"));
+keymap.set("j", () =>
+    executeCommand(selecting ? "cursorDownSelect" : "cursorDown")
+);
+keymap.set("k", () =>
+    executeCommand(selecting ? "cursorUpSelect" : "cursorUp")
+);
+keymap.set("l", () =>
+    executeCommand(selecting ? "cursorLeftSelect" : "cursorLeft")
+);
+keymap.set(";", () =>
+    executeCommand(selecting ? "cursorRightSelect" : "cursorRight")
+);
 keymap.set("'", () => executeCommand("editor.action.commentLine"));
 keymap.set("z", undefined);
-keymap.set("x", () => saveSelections(async () => {
-    await executeCommand("editor.action.addSelectionToNextFindMatch");
-    await executeCommand("editor.action.clipboardCopyAction");
-}));
+keymap.set("x", () =>
+    saveSelections(async () => {
+        await executeCommand("editor.action.addSelectionToNextFindMatch");
+        await executeCommand("editor.action.clipboardCopyAction");
+    })
+);
 keymap.set("c", () => executeCommand("editor.action.startFindReplaceAction"));
 keymap.set("v", () => executeCommand("actions.find"));
 keymap.set("b", undefined);
 keymap.set("n", undefined);
-keymap.set("m", () => executeCommand(selecting ? "cursorWordStartLeftSelect" : "cursorWordStartLeft"));
-keymap.set(",", () => executeCommand(selecting ? "cursorWordEndRightSelect" : "cursorWordEndRight"));
+keymap.set("m", () =>
+    executeCommand(
+        selecting ? "cursorWordStartLeftSelect" : "cursorWordStartLeft"
+    )
+);
+keymap.set(",", () =>
+    executeCommand(
+        selecting ? "cursorWordEndRightSelect" : "cursorWordEndRight"
+    )
+);
 keymap.set(".", () => executeCommand("workbench.action.focusNextGroup"));
 keymap.set("/", () => executeCommand("undo"));
 keymap.set("?", () => executeCommand("redo"));
@@ -221,7 +253,9 @@ hKeymap.set("y", () => executeCommand("rewrap.rewrapComment"));
 hKeymap.set("u", () => executeCommand("insert-unicode.insertText"));
 hKeymap.set("f", () => executeCommand("copyFilePath"));
 hKeymap.set("p", () => executeCommand("workbench.action.gotoLine"));
-hKeymap.set("x", () => executeCommand("workbench.action.closeEditorsInOtherGroups"));
+hKeymap.set("x", () =>
+    executeCommand("workbench.action.closeEditorsInOtherGroups")
+);
 hKeymap.set("b", () => executeCommand("gitlens.toggleFileBlame"));
 hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
 hKeymap.set("z", async () => {
@@ -245,7 +279,6 @@ hKeymap.set("n", () => executeCommand("editor.action.rename"));
 // fix merge line upward
 
 function onType(event: { text: string }) {
-
     if (lastKey === "h") {
         const callback = hKeymap.get(event.text);
         if (callback) {
