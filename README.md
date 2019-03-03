@@ -16,11 +16,13 @@ Why `0$`? Why not `op`?
 
 Why `Ctrl-U Ctrl-D`? Why not `ui`?
 
-Bext is a modal editor, but with keybindings that *aren't* based on vim.
+Bext is a modal editor, but with keybindings that _aren't_ based on vim.
 
 Instead, I made the keybindings by adding my most common shortcuts to a
 blank keyboard layout.
+
 <!-- This lets me throw out vim shortcuts that I rarely used (`123456789qwtp[]\as`), and improve the placement of shortcuts I use often (`i Ctrl-R`) -->
+
 This let me throw out vim shortcuts that I rarely used, and improve the placement of shortcuts I use often.
 
 ## Release Notes

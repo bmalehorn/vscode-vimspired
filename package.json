@@ -1,65 +1,64 @@
 {
-    "name": "bext",
-    "displayName": "bext",
-    "description": "Brian's EXTension",
-    "version": "2.0.0",
-    "publisher": "bmalehorn",
-    "engines": {
-        "vscode": "^1.28.0"
-    },
-    "repository": {
-        "url": "https://github.com/bmalehorn/vscode-bext"
-    },
-    "categories": [
-        "Other"
+  "name": "bext",
+  "displayName": "bext",
+  "description": "Brian's EXTension",
+  "version": "2.0.0",
+  "publisher": "bmalehorn",
+  "engines": {
+    "vscode": "^1.28.0"
+  },
+  "repository": {
+    "url": "https://github.com/bmalehorn/vscode-bext"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/bext",
+  "contributes": {
+    "commands": [
+      {
+        "command": "bext.enterNormal",
+        "title": "Bext: normal mode"
+      },
+      {
+        "command": "bext.enterInsert",
+        "title": "Bext: insert mode"
+      }
     ],
-    "activationEvents": [
-        "*"
-    ],
-    "main": "./out/bext",
-    "contributes": {
-        "commands": [
-            {
-                "command": "bext.enterNormal",
-                "title": "Bext: normal mode"
-            },
-            {
-                "command": "bext.enterInsert",
-                "title": "Bext: insert mode"
-            }
-        ],
-        "keybindings": [
-            {
-                "key": "Escape",
-                "command": "bext.enterNormal",
-                "when": "editorTextFocus"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-    },
-    "extensionDependencies": [
-        "stkb.rewrap",
-        "brunnerh.insert-unicode",
-        "eamodio.gitlens"
-    ],
-    "devDependencies": {
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "prettier": "^1.16.4",
-        "tslint": "^5.8.0",
-        "typescript": "^3.2.4",
-        "vscode": "^1.1.29"
-    },
-    "__metadata": {
-        "id": "20b6ea6f-43c5-4004-b393-c237975cbd76",
-        "publisherDisplayName": "Brian Malehorn",
-        "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
-    },
-    "dependencies": {}
+    "keybindings": [
+      {
+        "key": "Escape",
+        "command": "bext.enterNormal",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "extensionDependencies": [
+    "stkb.rewrap",
+    "brunnerh.insert-unicode",
+    "eamodio.gitlens"
+  ],
+  "devDependencies": {
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^7.0.43",
+    "prettier": "^1.16.4",
+    "typescript": "^3.2.4",
+    "vscode": "^1.1.29"
+  },
+  "__metadata": {
+    "id": "20b6ea6f-43c5-4004-b393-c237975cbd76",
+    "publisherDisplayName": "Brian Malehorn",
+    "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
+  },
+  "dependencies": {}
 }
