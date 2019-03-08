@@ -121,168 +121,190 @@ async function saveSelections(callback: () => Thenable<void>) {
   editor.selections = selections;
 }
 
-const keymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
-keymap.set("`", undefined);
-keymap.set("1", () => executeCommand("workbench.action.findInFiles"));
-keymap.set("2", () => executeCommand("editor.action.goToDeclaration"));
-keymap.set("@", () => executeCommand("references-view.find"));
-keymap.set("3", () => executeCommand("editor.action.openLink"));
-keymap.set("4", undefined);
-keymap.set("5", () =>
-  executeCommand(getSelecting() ? "cursorTopSelect" : "cursorTop"),
-);
-keymap.set("6", undefined);
-keymap.set("7", () => executeCommand("workbench.action.navigateBack"));
-keymap.set("8", () =>
-  executeCommand(getSelecting() ? "cursorBottomSelect" : "cursorBottom"),
-);
-keymap.set("9", async () => {
-  await executeCommand("cursorLineEnd");
-  await executeCommand("cursorHome");
-  await executeCommand("cursorHome");
-  await executeCommand("extension.smartBackspace");
-});
-keymap.set("0", () => executeCommand("editor.action.marker.nextInFiles"));
-keymap.set(")", () => executeCommand("editor.action.marker.prevInFiles"));
-keymap.set("-", undefined);
-keymap.set("=", () => swapActiveAndAnchor());
-keymap.set("q", () => executeCommand("editor.action.formatDocument"));
-keymap.set("Q", () => executeCommand("tslint.fixAllProblems"));
-keymap.set("w", async () => {
-  if (!getSelecting()) {
-    await executeCommand("cursorLineStart");
-    await executeCommand("cursorEndSelect");
-    await executeCommand("cursorEndSelect");
-    await executeCommand("cursorRightSelect");
-  }
-  await executeCommand("editor.action.clipboardCutAction");
-});
-keymap.set("e", () => executeCommand("deleteLeft"));
-keymap.set("r", async () => {
-  await executeCommand("editor.action.insertLineAfter");
-  enterInsert();
-});
-keymap.set("t", () => toggleZeroWidthSelecting());
-keymap.set("y", () => executeCommand("editor.action.wordHighlight.next"));
-keymap.set("Y", () => executeCommand("editor.action.wordHighlight.prev"));
-keymap.set("u", () => moveDown(10));
-keymap.set("i", () => moveDown(-10));
-keymap.set("o", async () => {
-  // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
-  if (getSelecting()) {
-    await executeCommand("cursorHomeSelect");
-    await executeCommand("cursorHomeSelect");
-  } else {
-    await executeCommand("cursorLineStart");
-  }
-});
-keymap.set("O", () =>
-  executeCommand(getSelecting() ? "cursorHomeSelect" : "cursorHome"),
-);
-keymap.set("p", async () => {
-  if (getSelecting()) {
-    await executeCommand("cursorEndSelect");
-    await executeCommand("cursorEndSelect");
-  } else {
+type Keymap = {
+  [key: string]: string | Array<string> | (() => Thenable<void>) | undefined;
+};
+// const newKeymap: object<
+const myKeymap: Keymap = {
+  // "`": undefined,
+  "1": () => executeCommand("workbench.action.findInFiles"),
+  "2": () => executeCommand("editor.action.goToDeclaration"),
+};
+const keymap: Keymap = {
+  "`": undefined,
+  "1": () => executeCommand("workbench.action.findInFiles"),
+  "2": () => executeCommand("editor.action.goToDeclaration"),
+  "@": () => executeCommand("references-view.find"),
+  "3": () => executeCommand("editor.action.openLink"),
+  "4": undefined,
+  "5": () => executeCommand(getSelecting() ? "cursorTopSelect" : "cursorTop"),
+  "6": undefined,
+  "7": () => executeCommand("workbench.action.navigateBack"),
+  "8": () =>
+    executeCommand(getSelecting() ? "cursorBottomSelect" : "cursorBottom"),
+  "9": async () => {
     await executeCommand("cursorLineEnd");
-  }
-});
-keymap.set("[", () => executeCommand("workbench.action.showCommands"));
-keymap.set("]", undefined);
-keymap.set("\\", undefined);
-keymap.set("a", async () => {
-  if (!getSelecting()) {
-    await executeCommand("cursorLineStart");
-    await executeCommand("cursorEndSelect");
-    await executeCommand("cursorEndSelect");
-    await executeCommand("cursorRightSelect");
-  }
-  await executeCommand("editor.action.clipboardCopyAction");
-  await cancelSelecting();
-});
-keymap.set("s", () => executeCommand("editor.action.clipboardPasteAction"));
-keymap.set("d", () => executeCommand("deleteWordLeft"));
-keymap.set("f", async () => enterInsert());
-keymap.set("g", undefined);
-keymap.set("j", () =>
-  executeCommand(getSelecting() ? "cursorDownSelect" : "cursorDown"),
-);
-keymap.set("k", () =>
-  executeCommand(getSelecting() ? "cursorUpSelect" : "cursorUp"),
-);
-keymap.set("l", () =>
-  executeCommand(getSelecting() ? "cursorLeftSelect" : "cursorLeft"),
-);
-keymap.set(";", () =>
-  executeCommand(getSelecting() ? "cursorRightSelect" : "cursorRight"),
-);
-keymap.set("'", () => executeCommand("editor.action.commentLine"));
-keymap.set("z", undefined);
-keymap.set("x", () =>
-  saveSelections(async () => {
-    await executeCommand("editor.action.addSelectionToNextFindMatch");
+    await executeCommand("cursorHome");
+    await executeCommand("cursorHome");
+    await executeCommand("extension.smartBackspace");
+  },
+  "0": () => executeCommand("editor.action.marker.nextInFiles"),
+  ")": () => executeCommand("editor.action.marker.prevInFiles"),
+  "-": undefined,
+  "=": () => swapActiveAndAnchor(),
+  q: () => executeCommand("editor.action.formatDocument"),
+  Q: () => executeCommand("tslint.fixAllProblems"),
+  w: async () => {
+    if (!getSelecting()) {
+      await executeCommand("cursorLineStart");
+      await executeCommand("cursorEndSelect");
+      await executeCommand("cursorEndSelect");
+      await executeCommand("cursorRightSelect");
+    }
+    await executeCommand("editor.action.clipboardCutAction");
+  },
+  e: () => executeCommand("deleteLeft"),
+  r: async () => {
+    await executeCommand("editor.action.insertLineAfter");
+    enterInsert();
+  },
+  t: () => toggleZeroWidthSelecting(),
+  y: () => executeCommand("editor.action.wordHighlight.next"),
+  Y: () => executeCommand("editor.action.wordHighlight.prev"),
+  u: () => moveDown(10),
+  i: () => moveDown(-10),
+  o: async () => {
+    // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
+    if (getSelecting()) {
+      await executeCommand("cursorHomeSelect");
+      await executeCommand("cursorHomeSelect");
+    } else {
+      await executeCommand("cursorLineStart");
+    }
+  },
+  O: () => executeCommand(getSelecting() ? "cursorHomeSelect" : "cursorHome"),
+  p: async () => {
+    if (getSelecting()) {
+      await executeCommand("cursorEndSelect");
+      await executeCommand("cursorEndSelect");
+    } else {
+      await executeCommand("cursorLineEnd");
+    }
+  },
+  "[": () => executeCommand("workbench.action.showCommands"),
+  "]": undefined,
+  "\\": undefined,
+  a: async () => {
+    if (!getSelecting()) {
+      await executeCommand("cursorLineStart");
+      await executeCommand("cursorEndSelect");
+      await executeCommand("cursorEndSelect");
+      await executeCommand("cursorRightSelect");
+    }
     await executeCommand("editor.action.clipboardCopyAction");
-  }),
-);
-keymap.set("c", () => executeCommand("editor.action.startFindReplaceAction"));
-keymap.set("v", () => executeCommand("actions.find"));
-keymap.set("b", undefined);
-keymap.set("n", undefined);
-keymap.set("m", () =>
-  executeCommand(
-    getSelecting() ? "cursorWordStartLeftSelect" : "cursorWordStartLeft",
-  ),
-);
-keymap.set(",", () =>
-  executeCommand(
-    getSelecting() ? "cursorWordEndRightSelect" : "cursorWordEndRight",
-  ),
-);
-keymap.set(".", () => executeCommand("workbench.action.focusNextGroup"));
-keymap.set("/", () => executeCommand("undo"));
-keymap.set("?", () => executeCommand("redo"));
-keymap.set(" ", () => executeCommand("workbench.action.quickOpen"));
+    await cancelSelecting();
+  },
+  s: () => executeCommand("editor.action.clipboardPasteAction"),
+  d: () => executeCommand("deleteWordLeft"),
+  f: async () => enterInsert(),
+  g: undefined,
+  j: () => executeCommand(getSelecting() ? "cursorDownSelect" : "cursorDown"),
+  k: () => executeCommand(getSelecting() ? "cursorUpSelect" : "cursorUp"),
+  l: () => executeCommand(getSelecting() ? "cursorLeftSelect" : "cursorLeft"),
+  ";": () =>
+    executeCommand(getSelecting() ? "cursorRightSelect" : "cursorRight"),
+  "'": () => executeCommand("editor.action.commentLine"),
+  z: undefined,
+  x: () =>
+    saveSelections(async () => {
+      await executeCommand("editor.action.addSelectionToNextFindMatch");
+      await executeCommand("editor.action.clipboardCopyAction");
+    }),
+  c: () => executeCommand("editor.action.startFindReplaceAction"),
+  v: () => executeCommand("actions.find"),
+  b: undefined,
+  n: undefined,
+  m: () =>
+    executeCommand(
+      getSelecting() ? "cursorWordStartLeftSelect" : "cursorWordStartLeft",
+    ),
+  ",": () =>
+    executeCommand(
+      getSelecting() ? "cursorWordEndRightSelect" : "cursorWordEndRight",
+    ),
+  ".": () => executeCommand("workbench.action.focusNextGroup"),
+  "/": () => executeCommand("undo"),
+  "?": () => executeCommand("redo"),
+  " ": () => executeCommand("workbench.action.quickOpen"),
+};
 
-const hKeymap: Map<string, (() => Thenable<void>) | undefined> = new Map();
-hKeymap.set("r", () => executeCommand("workbench.action.reloadWindow"));
-hKeymap.set("y", () => executeCommand("rewrap.rewrapComment"));
-hKeymap.set("u", () => executeCommand("insert-unicode.insertText"));
-hKeymap.set("f", () => executeCommand("copyFilePath"));
-hKeymap.set("p", () => executeCommand("workbench.action.gotoLine"));
-hKeymap.set("x", () =>
-  executeCommand("workbench.action.closeEditorsInOtherGroups"),
-);
-hKeymap.set("b", () => executeCommand("gitlens.toggleFileBlame"));
-hKeymap.set("m", () => executeCommand("workbench.action.maximizeEditor"));
-hKeymap.set("z", async () => {
-  await executeCommand("workbench.action.focusSecondEditorGroup");
-  await executeCommand("workbench.action.quickOpen");
-});
-hKeymap.set("s", () => executeCommand("editor.action.sortLinesAscending"));
-hKeymap.set("n", () => executeCommand("editor.action.rename"));
+const hKeymap: Keymap = {
+  r: () => executeCommand("workbench.action.reloadWindow"),
+  y: () => executeCommand("rewrap.rewrapComment"),
+  u: () => executeCommand("insert-unicode.insertText"),
+  f: () => executeCommand("copyFilePath"),
+  p: () => executeCommand("workbench.action.gotoLine"),
+  x: () => executeCommand("workbench.action.closeEditorsInOtherGroups"),
+  b: () => executeCommand("gitlens.toggleFileBlame"),
+  m: () => executeCommand("workbench.action.maximizeEditor"),
+  z: async () => {
+    await executeCommand("workbench.action.focusSecondEditorGroup");
+    await executeCommand("workbench.action.quickOpen");
+  },
+  s: () => executeCommand("editor.action.sortLinesAscending"),
+  n: () => executeCommand("editor.action.rename"),
+};
 
 /////////////////
 //
 // to bind:
 //
 // todo:
+// - no more `getSelecting() ?`: save & restore point, even when running
+//   cursorDown
+// - use object, allowing string
 // - find file at point
 // - previous / next terminal
 // - jump into / out of cmd-j menu
 
+function isNumber(x: any): x is number {
+  return typeof x === "number";
+}
+
+function isString(x: any): x is string {
+  return typeof x === "string";
+}
+
+function isUndefined(x: any): x is undefined {
+  return typeof x === "undefined";
+}
+
+function isStringList(x: any): x is Array<string> {
+  return Array.isArray(x) && x.every(element => isString(element));
+}
+
+// function thenableAll(a )
+
 async function onType(event: { text: string }): Promise<void> {
   adjustSelecting();
-  if (lastKey === "h") {
-    const callback = hKeymap.get(event.text);
-    if (callback) {
-      await callback();
-    }
-  } else {
-    const callback = keymap.get(event.text);
-    if (callback) {
-      await callback();
-    }
+  const binding = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
+
+  let callback: () => Thenable<void> = async () => {};
+
+  if (isString(binding)) {
+    callback = () => executeCommand(binding);
+  } else if (isStringList(binding)) {
+    binding.reduce(
+      (previousValue, currentValue) =>
+        previousValue.then(() => executeCommand(currentValue)),
+      Promise.resolve() as Thenable<void>,
+    );
+    // callback = () =>
+    //   Promise.all(binding.map(command => null));
+  } else if (isUndefined(binding)) {
+    callback = async () => {};
   }
+
   adjustSelecting();
   lastKey = event.text;
 }
