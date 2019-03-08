@@ -267,42 +267,32 @@ const hKeymap: Keymap = {
 // - previous / next terminal
 // - jump into / out of cmd-j menu
 
-function isNumber(x: any): x is number {
-  return typeof x === "number";
-}
-
 function isString(x: any): x is string {
   return typeof x === "string";
-}
-
-function isUndefined(x: any): x is undefined {
-  return typeof x === "undefined";
 }
 
 function isStringList(x: any): x is Array<string> {
   return Array.isArray(x) && x.every(element => isString(element));
 }
 
-// function thenableAll(a )
+function isUndefined(x: any): x is undefined {
+  return typeof x === "undefined";
+}
 
 async function onType(event: { text: string }): Promise<void> {
   adjustSelecting();
   const binding = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
 
-  let callback: () => Thenable<void> = async () => {};
-
   if (isString(binding)) {
-    callback = () => executeCommand(binding);
+    await executeCommand(binding);
   } else if (isStringList(binding)) {
-    binding.reduce(
-      (previousValue, currentValue) =>
-        previousValue.then(() => executeCommand(currentValue)),
-      Promise.resolve() as Thenable<void>,
-    );
-    // callback = () =>
-    //   Promise.all(binding.map(command => null));
+    for (const command in binding) {
+      await executeCommand(command);
+    }
   } else if (isUndefined(binding)) {
-    callback = async () => {};
+    // do nothing
+  } else {
+    await binding();
   }
 
   adjustSelecting();
