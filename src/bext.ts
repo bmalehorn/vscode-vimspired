@@ -121,8 +121,16 @@ async function saveSelections(callback: () => Thenable<void>) {
   editor.selections = selections;
 }
 
+type SelectingBranch = { whenSelecting: Action; otherwise: Action };
+type Action =
+  | string
+  | Array<string>
+  | (() => Thenable<void>)
+  | undefined
+  | SelectingBranch;
+
 type Keymap = {
-  [key: string]: string | Array<string> | (() => Thenable<void>) | undefined;
+  [key: string]: Action;
 };
 const keymap: Keymap = {
   "`": undefined,
@@ -131,11 +139,13 @@ const keymap: Keymap = {
   "@": "references-view.find",
   "3": "editor.action.openLink",
   "4": "removeSecondaryCursors",
-  "5": () => executeCommand(getSelecting() ? "cursorTopSelect" : "cursorTop"),
+  "5": { whenSelecting: "cursorTopSelect", otherwise: "cursorTop" },
   "6": undefined,
   "7": "workbench.action.navigateBack",
-  "8": () =>
-    executeCommand(getSelecting() ? "cursorBottomSelect" : "cursorBottom"),
+  "8": {
+    whenSelecting: "cursorBottomSelect",
+    otherwise: "cursorBottom",
+  },
   "9": [
     "cursorLineEnd",
     "cursorHome",
@@ -148,14 +158,15 @@ const keymap: Keymap = {
   "=": () => swapActiveAndAnchor(),
   q: "editor.action.formatDocument",
   Q: "tslint.fixAllProblems",
-  w: async () => {
-    if (!getSelecting()) {
-      await executeCommand("cursorLineStart");
-      await executeCommand("cursorEndSelect");
-      await executeCommand("cursorEndSelect");
-      await executeCommand("cursorRightSelect");
-    }
-    await executeCommand("editor.action.clipboardCutAction");
+  w: {
+    whenSelecting: "editor.action.clipboardCutAction",
+    otherwise: [
+      "cursorLineStart",
+      "cursorEndSelect",
+      "cursorEndSelect",
+      "cursorRightSelect",
+      "editor.action.clipboardCutAction",
+    ],
   },
   e: "deleteLeft",
   r: async () => {
@@ -167,23 +178,15 @@ const keymap: Keymap = {
   Y: "editor.action.wordHighlight.prev",
   u: () => moveDown(10),
   i: () => moveDown(-10),
-  o: async () => {
+  o: {
     // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
-    if (getSelecting()) {
-      await executeCommand("cursorHomeSelect");
-      await executeCommand("cursorHomeSelect");
-    } else {
-      await executeCommand("cursorLineStart");
-    }
+    whenSelecting: ["cursorHomeSelect", "cursorHomeSelect"],
+    otherwise: "cursorLineStart",
   },
-  O: () => executeCommand(getSelecting() ? "cursorHomeSelect" : "cursorHome"),
-  p: async () => {
-    if (getSelecting()) {
-      await executeCommand("cursorEndSelect");
-      await executeCommand("cursorEndSelect");
-    } else {
-      await executeCommand("cursorLineEnd");
-    }
+  O: { whenSelecting: "cursorHomeSelect", otherwise: "cursorHome" },
+  p: {
+    whenSelecting: ["cursorEndSelect", "cursorEndSelect"],
+    otherwise: "cursorLineEnd",
   },
   "[": "workbench.action.showCommands",
   "]": undefined,
@@ -202,11 +205,10 @@ const keymap: Keymap = {
   d: "deleteWordLeft",
   f: async () => enterInsert(),
   g: undefined,
-  j: () => executeCommand(getSelecting() ? "cursorDownSelect" : "cursorDown"),
-  k: () => executeCommand(getSelecting() ? "cursorUpSelect" : "cursorUp"),
-  l: () => executeCommand(getSelecting() ? "cursorLeftSelect" : "cursorLeft"),
-  ";": () =>
-    executeCommand(getSelecting() ? "cursorRightSelect" : "cursorRight"),
+  j: { whenSelecting: "cursorDownSelect", otherwise: "cursorDown" },
+  k: { whenSelecting: "cursorUpSelect", otherwise: "cursorUp" },
+  l: { whenSelecting: "cursorLeftSelect", otherwise: "cursorLeft" },
+  ";": { whenSelecting: "cursorRightSelect", otherwise: "cursorRight" },
   "'": "editor.action.commentLine",
   z: undefined,
   x: () =>
@@ -218,14 +220,14 @@ const keymap: Keymap = {
   v: "actions.find",
   b: undefined,
   n: undefined,
-  m: () =>
-    executeCommand(
-      getSelecting() ? "cursorWordStartLeftSelect" : "cursorWordStartLeft",
-    ),
-  ",": () =>
-    executeCommand(
-      getSelecting() ? "cursorWordEndRightSelect" : "cursorWordEndRight",
-    ),
+  m: {
+    whenSelecting: "cursorWordStartLeftSelect",
+    otherwise: "cursorWordStartLeft",
+  },
+  ",": {
+    whenSelecting: "cursorWordEndRightSelect",
+    otherwise: "cursorWordEndRight",
+  },
   ".": "workbench.action.focusNextGroup",
   "/": "undo",
   "?": "redo",
@@ -267,21 +269,35 @@ function isUndefined(x: any): x is undefined {
   return typeof x === "undefined";
 }
 
-async function onType(event: { text: string }): Promise<void> {
-  adjustSelecting();
-  const binding = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
+function isWhenSelecting(x: any): x is SelectingBranch {
+  return typeof x === "object" && "whenSelecting" in x && "otherwise" in x;
+}
 
-  if (isString(binding)) {
-    await executeCommand(binding);
-  } else if (isStringList(binding)) {
-    for (const command in binding) {
+async function evalAction(action: Action): Promise<void> {
+  if (isString(action)) {
+    await executeCommand(action);
+  } else if (isStringList(action)) {
+    for (const command in action) {
       await executeCommand(command);
     }
-  } else if (isUndefined(binding)) {
+  } else if (isUndefined(action)) {
     // do nothing
+  } else if (isWhenSelecting(action)) {
+    if (getSelecting()) {
+      await evalAction(action.whenSelecting);
+    } else {
+      await evalAction(action.otherwise);
+    }
   } else {
-    await binding();
+    await action();
   }
+}
+
+async function onType(event: { text: string }): Promise<void> {
+  adjustSelecting();
+
+  const action = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
+  evalAction(action);
 
   adjustSelecting();
   lastKey = event.text;
