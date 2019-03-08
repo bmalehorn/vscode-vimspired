@@ -9,14 +9,14 @@ let typeSubscription: vscode.Disposable | undefined;
 let lastKey: string | undefined;
 let zeroWidthSelecting = false;
 
-async function cancelSelecting(): Promise<void> {
+async function cancelSelection(): Promise<void> {
   await executeCommand("cancelSelection");
   zeroWidthSelecting = false;
 }
 
-async function toggleZeroWidthSelecting(): Promise<void> {
+async function toggleSelection(): Promise<void> {
   const oldZeroWidthSelecting = zeroWidthSelecting;
-  await cancelSelecting();
+  await cancelSelection();
   zeroWidthSelecting = !oldZeroWidthSelecting;
 }
 
@@ -45,6 +45,27 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("bext.enterInsert", enterInsert),
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("bext.toggleSelection", toggleSelection),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("bext.moveDown", moveDown),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("bext.moveUp", moveUp),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "bext.swapActiveAndAnchor",
+      swapActiveAndAnchor,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("bext.copyWord", copyWord),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("bext.cancelSelection", cancelSelection),
+  );
   enterNormal();
 }
 
@@ -69,7 +90,7 @@ async function setNormal(normal: boolean): Promise<void> {
     : vscode.TextEditorCursorStyle.Underline;
   // executeCommand("removeSecondaryCursors");
   await executeCommand("setContext", "bext.normal", normal);
-  cancelSelecting();
+  cancelSelection();
 }
 
 // this method is called when your extension is deactivated
@@ -77,7 +98,15 @@ export function deactivate() {
   enterInsert();
 }
 
-async function moveDown(lines: number, buffer: number = 1) {
+function moveDown(): Promise<void> {
+  return _moveDown(10);
+}
+
+function moveUp(): Promise<void> {
+  return _moveDown(-10);
+}
+
+async function _moveDown(lines: number, buffer: number = 1) {
   const editor = vscode.window.activeTextEditor!;
   const { start, end } = editor.visibleRanges[0];
   const newRange = new Range(
@@ -121,6 +150,13 @@ async function saveSelections(callback: () => Thenable<void>) {
   editor.selections = selections;
 }
 
+async function copyWord(): Promise<void> {
+  await saveSelections(async () => {
+    await executeCommand("editor.action.addSelectionToNextFindMatch");
+    await executeCommand("editor.action.clipboardCopyAction");
+  });
+}
+
 type SelectingBranch = { whenSelecting: Action; otherwise: Action };
 type Action =
   | string
@@ -155,7 +191,7 @@ const keymap: Keymap = {
   "0": "editor.action.marker.nextInFiles",
   ")": "editor.action.marker.prevInFiles",
   "-": undefined,
-  "=": () => swapActiveAndAnchor(),
+  "=": "bext.swapActiveAndAnchor",
   q: "editor.action.formatDocument",
   Q: "tslint.fixAllProblems",
   w: {
@@ -169,15 +205,12 @@ const keymap: Keymap = {
     ],
   },
   e: "deleteLeft",
-  r: async () => {
-    await executeCommand("editor.action.insertLineAfter");
-    enterInsert();
-  },
-  t: () => toggleZeroWidthSelecting(),
+  r: ["editor.action.insertLineAfter", "bext.enterInsert"],
+  t: "bext.toggleSelection",
   y: "editor.action.wordHighlight.next",
   Y: "editor.action.wordHighlight.prev",
-  u: () => moveDown(10),
-  i: () => moveDown(-10),
+  u: "bext.moveDown",
+  i: "bext.moveUp",
   o: {
     // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
     whenSelecting: ["cursorHomeSelect", "cursorHomeSelect"],
@@ -185,25 +218,29 @@ const keymap: Keymap = {
   },
   O: { whenSelecting: "cursorHomeSelect", otherwise: "cursorHome" },
   p: {
-    whenSelecting: ["cursorEndSelect", "cursorEndSelect"],
+    whenSelecting: "cursorEndSelect",
     otherwise: "cursorLineEnd",
   },
   "[": "workbench.action.showCommands",
   "]": undefined,
   "\\": undefined,
-  a: async () => {
-    if (!getSelecting()) {
-      await executeCommand("cursorLineStart");
-      await executeCommand("cursorEndSelect");
-      await executeCommand("cursorEndSelect");
-      await executeCommand("cursorRightSelect");
-    }
-    await executeCommand("editor.action.clipboardCopyAction");
-    await cancelSelecting();
+  a: {
+    whenSelecting: [
+      "editor.action.clipboardCopyAction",
+      "bext.cancelSelection",
+    ],
+    otherwise: [
+      "cursorLineStart",
+      "cursorEndSelect",
+      "cursorEndSelect",
+      "cursorRightSelect",
+      "editor.action.clipboardCopyAction",
+      "bext.cancelSelection",
+    ],
   },
   s: "editor.action.clipboardPasteAction",
   d: "deleteWordLeft",
-  f: async () => enterInsert(),
+  f: "bext.enterInsert",
   g: undefined,
   j: { whenSelecting: "cursorDownSelect", otherwise: "cursorDown" },
   k: { whenSelecting: "cursorUpSelect", otherwise: "cursorUp" },
@@ -211,11 +248,7 @@ const keymap: Keymap = {
   ";": { whenSelecting: "cursorRightSelect", otherwise: "cursorRight" },
   "'": "editor.action.commentLine",
   z: undefined,
-  x: () =>
-    saveSelections(async () => {
-      await executeCommand("editor.action.addSelectionToNextFindMatch");
-      await executeCommand("editor.action.clipboardCopyAction");
-    }),
+  x: "bext.copyWord",
   c: "editor.action.startFindReplaceAction",
   v: "actions.find",
   b: undefined,
@@ -277,7 +310,7 @@ async function evalAction(action: Action): Promise<void> {
   if (isString(action)) {
     await executeCommand(action);
   } else if (isStringList(action)) {
-    for (const command in action) {
+    for (const command of action) {
       await executeCommand(command);
     }
   } else if (isUndefined(action)) {
