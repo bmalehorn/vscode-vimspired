@@ -18,6 +18,22 @@
   ],
   "main": "./out/bext",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Brian's Extension",
+      "properties": {
+        "bext.coolness": {
+          "type": "number",
+          "default": 1337,
+          "description": "How cool is this extension?"
+        },
+        "bext.keybindings": {
+          "type": "object",
+          "default": {},
+          "description": "Keybindings"
+        }
+      }
+    },
     "commands": [
       {
         "command": "bext.enterNormal",
@@ -49,9 +65,11 @@
     "eamodio.gitlens"
   ],
   "devDependencies": {
+    "@types/lodash": "^4.14.122",
     "@types/mocha": "^2.2.42",
     "@types/node": "^7.0.43",
     "husky": "^1.3.1",
+    "lodash": "^4.17.11",
     "prettier": "^1.16.4",
     "pretty-quick": "^1.10.0",
     "tslint-config-prettier": "^1.18.0",
@@ -64,6 +82,7 @@
     "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
   },
   "dependencies": {
+    "lodash": "^4.17.11",
     "vscode": "^1.1.29"
   },
   "husky": {

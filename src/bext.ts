@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 // tslint:disable-next-line
 import { Range, Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
+import { pickBy } from "lodash";
 
 let typeSubscription: vscode.Disposable | undefined;
 let lastKey: string | undefined;
@@ -36,9 +37,29 @@ function getSelecting(): boolean {
   return normalSelecting() || zeroWidthSelecting;
 }
 
+let keymap: IKeymap = {};
+
+function updateKeymapFromConfiguration(): void {
+  const userKeybindings =
+    vscode.workspace.getConfiguration("bext.keybindings") || {};
+  const safeKeybindings = pickBy(
+    userKeybindings,
+    value =>
+      isString(value) ||
+      isStringList(value) ||
+      isUndefined(value) ||
+      isWhenSelecting(value),
+  );
+  console.log("@@@ safeKeybindings", safeKeybindings);
+
+  keymap = { ...defaultKeymap, ...safeKeybindings };
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  console.log("@@@ activate");
+
   context.subscriptions.push(
     vscode.commands.registerCommand("bext.enterNormal", enterNormal),
   );
@@ -66,6 +87,11 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("bext.cancelSelection", cancelSelection),
   );
+
+  vscode.workspace.onDidChangeConfiguration(updateKeymapFromConfiguration);
+
+  updateKeymapFromConfiguration();
+
   enterNormal();
 }
 
@@ -157,30 +183,29 @@ async function copyWord(): Promise<void> {
   });
 }
 
-type SelectingBranch = { whenSelecting: Action; otherwise: Action };
-type Action =
-  | string
-  | Array<string>
-  | (() => Thenable<void>)
-  | undefined
-  | SelectingBranch;
+interface IBranch {
+  whenSelecting: Action;
+  default: Action;
+}
 
-type Keymap = {
+type Action = string | string[] | (() => Thenable<void>) | undefined | IBranch;
+
+interface IKeymap {
   [key: string]: Action;
-};
-const keymap: Keymap = {
+}
+const defaultKeymap: IKeymap = {
   "`": undefined,
   "1": "workbench.action.findInFiles",
   "2": "editor.action.goToDeclaration",
   "@": "references-view.find",
   "3": "editor.action.openLink",
   "4": "removeSecondaryCursors",
-  "5": { whenSelecting: "cursorTopSelect", otherwise: "cursorTop" },
+  "5": { whenSelecting: "cursorTopSelect", default: "cursorTop" },
   "6": undefined,
   "7": "workbench.action.navigateBack",
   "8": {
     whenSelecting: "cursorBottomSelect",
-    otherwise: "cursorBottom",
+    default: "cursorBottom",
   },
   "9": [
     "cursorLineEnd",
@@ -196,7 +221,7 @@ const keymap: Keymap = {
   Q: "tslint.fixAllProblems",
   w: {
     whenSelecting: "editor.action.clipboardCutAction",
-    otherwise: [
+    default: [
       "cursorLineStart",
       "cursorEndSelect",
       "cursorEndSelect",
@@ -214,12 +239,12 @@ const keymap: Keymap = {
   o: {
     // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
     whenSelecting: ["cursorHomeSelect", "cursorHomeSelect"],
-    otherwise: "cursorLineStart",
+    default: "cursorLineStart",
   },
-  O: { whenSelecting: "cursorHomeSelect", otherwise: "cursorHome" },
+  O: { whenSelecting: "cursorHomeSelect", default: "cursorHome" },
   p: {
     whenSelecting: "cursorEndSelect",
-    otherwise: "cursorLineEnd",
+    default: "cursorLineEnd",
   },
   "[": "workbench.action.showCommands",
   "]": undefined,
@@ -229,7 +254,7 @@ const keymap: Keymap = {
       "editor.action.clipboardCopyAction",
       "bext.cancelSelection",
     ],
-    otherwise: [
+    default: [
       "cursorLineStart",
       "cursorEndSelect",
       "cursorEndSelect",
@@ -242,10 +267,10 @@ const keymap: Keymap = {
   d: "deleteWordLeft",
   f: "bext.enterInsert",
   g: undefined,
-  j: { whenSelecting: "cursorDownSelect", otherwise: "cursorDown" },
-  k: { whenSelecting: "cursorUpSelect", otherwise: "cursorUp" },
-  l: { whenSelecting: "cursorLeftSelect", otherwise: "cursorLeft" },
-  ";": { whenSelecting: "cursorRightSelect", otherwise: "cursorRight" },
+  j: { whenSelecting: "cursorDownSelect", default: "cursorDown" },
+  k: { whenSelecting: "cursorUpSelect", default: "cursorUp" },
+  l: { whenSelecting: "cursorLeftSelect", default: "cursorLeft" },
+  ";": { whenSelecting: "cursorRightSelect", default: "cursorRight" },
   "'": "editor.action.commentLine",
   z: undefined,
   x: "bext.copyWord",
@@ -255,11 +280,11 @@ const keymap: Keymap = {
   n: undefined,
   m: {
     whenSelecting: "cursorWordStartLeftSelect",
-    otherwise: "cursorWordStartLeft",
+    default: "cursorWordStartLeft",
   },
   ",": {
     whenSelecting: "cursorWordEndRightSelect",
-    otherwise: "cursorWordEndRight",
+    default: "cursorWordEndRight",
   },
   ".": "workbench.action.focusNextGroup",
   "/": "undo",
@@ -267,7 +292,7 @@ const keymap: Keymap = {
   " ": "workbench.action.quickOpen",
 };
 
-const hKeymap: Keymap = {
+const hKeymap: IKeymap = {
   r: "workbench.action.reloadWindow",
   y: "rewrap.rewrapComment",
   u: "insert-unicode.insertText",
@@ -289,12 +314,13 @@ const hKeymap: Keymap = {
 // - find file at point
 // - previous / next terminal
 // - jump into / out of cmd-j menu
+// https://github.com/foxundermoon/vs-shell-format/blob/master/package.json
 
 function isString(x: any): x is string {
   return typeof x === "string";
 }
 
-function isStringList(x: any): x is Array<string> {
+function isStringList(x: any): x is string[] {
   return Array.isArray(x) && x.every(element => isString(element));
 }
 
@@ -302,8 +328,8 @@ function isUndefined(x: any): x is undefined {
   return typeof x === "undefined";
 }
 
-function isWhenSelecting(x: any): x is SelectingBranch {
-  return typeof x === "object" && "whenSelecting" in x && "otherwise" in x;
+function isWhenSelecting(x: any): x is IBranch {
+  return typeof x === "object" && "whenSelecting" in x && "default" in x;
 }
 
 async function evalAction(action: Action): Promise<void> {
@@ -319,7 +345,7 @@ async function evalAction(action: Action): Promise<void> {
     if (getSelecting()) {
       await evalAction(action.whenSelecting);
     } else {
-      await evalAction(action.otherwise);
+      await evalAction(action.default);
     }
   } else {
     await action();
