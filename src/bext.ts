@@ -50,7 +50,6 @@ function updateKeymapFromConfiguration(): void {
       isUndefined(value) ||
       isWhenSelecting(value),
   );
-  console.log("@@@ safeKeybindings", safeKeybindings);
 
   keymap = { ...defaultKeymap, ...safeKeybindings };
 }
@@ -58,8 +57,6 @@ function updateKeymapFromConfiguration(): void {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  console.log("@@@ activate");
-
   context.subscriptions.push(
     vscode.commands.registerCommand("bext.enterNormal", enterNormal),
   );
@@ -89,7 +86,6 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   vscode.workspace.onDidChangeConfiguration(updateKeymapFromConfiguration);
-
   updateKeymapFromConfiguration();
 
   enterNormal();
