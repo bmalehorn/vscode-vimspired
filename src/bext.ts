@@ -4,28 +4,28 @@ import * as vscode from "vscode";
 // tslint:disable-next-line
 import { Range, Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
-import { pickBy } from "lodash";
+import { pickBy, values } from "lodash";
 
 interface IBranch {
   selecting?: Action;
   default: Action;
 }
 
-type Action = string | string[] | (() => Thenable<void>) | null | IBranch;
+type Action = string | string[] | null | IBranch | IKeymap;
 
 interface IKeymap {
   [key: string]: Action;
 }
 
 let typeSubscription: vscode.Disposable | undefined;
-let lastKey: string | undefined;
 let zeroWidthSelecting = false;
 
-let keymap: IKeymap = {};
+let rootKeymap: IKeymap = {};
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  console.log("@@@ activate");
   context.subscriptions.push(
     vscode.commands.registerCommand("bext.enterNormal", enterNormal),
   );
@@ -84,7 +84,6 @@ async function setNormal(normal: boolean): Promise<void> {
   vscode.window.activeTextEditor!.options.cursorStyle = normal
     ? vscode.TextEditorCursorStyle.Block
     : vscode.TextEditorCursorStyle.Underline;
-  // executeCommand("removeSecondaryCursors");
   await executeCommand("setContext", "bext.normal", normal);
   cancelSelection();
 }
@@ -92,13 +91,12 @@ async function setNormal(normal: boolean): Promise<void> {
 function updateKeymapFromConfiguration(): void {
   const userKeybindings =
     vscode.workspace.getConfiguration("bext.keybindings") || {};
-  keymap = pickBy(
-    userKeybindings,
-    value =>
-      isString(value) ||
-      isStringList(value) ||
-      isNull(value) ||
-      isBranch(value),
+  rootKeymap = pickBy(userKeybindings, isAction);
+}
+
+function isAction(x: any): x is Action {
+  return (
+    isString(x) || isStringList(x) || isNull(x) || isBranch(x) || isKeymap(x)
   );
 }
 
@@ -118,6 +116,10 @@ function isBranch(x: any): x is IBranch {
   return typeof x === "object" && "default" in x;
 }
 
+function isKeymap(x: any): x is IKeymap {
+  return typeof x === "object" && !isBranch(x) && values(x).every(isAction);
+}
+
 async function evalAction(action: Action): Promise<void> {
   if (isString(action)) {
     await executeCommand(action);
@@ -133,41 +135,45 @@ async function evalAction(action: Action): Promise<void> {
     }
   } else if (!action) {
     // do nothing
+  } else if (isKeymap(action)) {
+    keymap = action;
   } else {
-    await action();
+    keymap = rootKeymap;
   }
 }
 
-const hKeymap: IKeymap = {
-  r: "workbench.action.reloadWindow",
-  y: "rewrap.rewrapComment",
-  u: "insert-unicode.insertText",
-  f: "copyFilePath",
-  p: "workbench.action.gotoLine",
-  x: "workbench.action.closeEditorsInOtherGroups",
-  b: "gitlens.toggleFileBlame",
-  m: "workbench.action.maximizeEditor",
-  z: ["workbench.action.focusSecondEditorGroup", "workbench.action.quickOpen"],
-  s: "editor.action.sortLinesAscending",
-  n: "editor.action.rename",
-};
+// const hKeymap: IKeymap = {
+//   r: "workbench.action.reloadWindow",
+//   y: "rewrap.rewrapComment",
+//   u: "insert-unicode.insertText",
+//   f: "copyFilePath",
+//   p: "workbench.action.gotoLine",
+//   x: "workbench.action.closeEditorsInOtherGroups",
+//   b: "gitlens.toggleFileBlame",
+//   m: "workbench.action.maximizeEditor",
+//   z: ["workbench.action.focusSecondEditorGroup", "workbench.action.quickOpen"],
+//   s: "editor.action.sortLinesAscending",
+//   n: "editor.action.rename",
+// };
 
 /////////////////
 //
 // to bind:
 //
 // todo:
+// - allow key chains, "h r": "workbench.action.reloadWindow"
 // - find file at point
 // - previous / next terminal
 // - jump into / out of cmd-j menu
 // https://github.com/foxundermoon/vs-shell-format/blob/master/package.json
 
+let keymap: IKeymap = rootKeymap;
+
 async function onType(event: { text: string }): Promise<void> {
   adjustSelecting();
 
-  const action = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
+  const action = keymap[event.text];
   evalAction(action);
-  lastKey = event.text;
 }
 
 /////////////////////////
