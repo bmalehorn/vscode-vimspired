@@ -26,7 +26,7 @@ Unlike vim modes, you start with a blank slate - get creative and make your very
 
 The `bext.keybindings` object accepts a few different values for the keybindings.
 
-### `string`
+### Single Command: `string`
 
 ```json
 {
@@ -38,7 +38,7 @@ This executes the VSCode command `cursorLeft`.
 You can find a list of all commands by pressing `Ctrl-K Ctrl-S`.
 For instance, I found this command because `LeftArrow` key is normally bound to `cursorLeft`.
 
-### `string[]`
+### Sequence of Commands: `string[]`
 
 ```json
 {
@@ -48,7 +48,17 @@ For instance, I found this command because `LeftArrow` key is normally bound to 
 
 Executes the list of commands in sequence.
 
-### `{selecting: any, default: any}`
+### Leader Key: `{ [key: string]: Action }`
+
+```json
+{
+  "g": { "q": "rewrap.rewrapComment" }
+}
+```
+
+Pressing `g q` will run the command `rewrap.rewrapComment`.
+
+### Highlighting: `{selecting: Action, default: Action}`
 
 ```json
 {

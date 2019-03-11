@@ -81,7 +81,11 @@ function enterInsert() {
 }
 
 async function setNormal(normal: boolean): Promise<void> {
-  vscode.window.activeTextEditor!.options.cursorStyle = normal
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return;
+  }
+  editor.options.cursorStyle = normal
     ? vscode.TextEditorCursorStyle.Block
     : vscode.TextEditorCursorStyle.Underline;
   await executeCommand("setContext", "bext.normal", normal);
@@ -121,6 +125,7 @@ function isKeymap(x: any): x is IKeymap {
 }
 
 async function evalAction(action: Action): Promise<void> {
+  keymap = rootKeymap;
   if (isString(action)) {
     await executeCommand(action);
   } else if (isStringList(action)) {
@@ -137,31 +142,14 @@ async function evalAction(action: Action): Promise<void> {
     // do nothing
   } else if (isKeymap(action)) {
     keymap = action;
-  } else {
-    keymap = rootKeymap;
   }
 }
-
-// const hKeymap: IKeymap = {
-//   r: "workbench.action.reloadWindow",
-//   y: "rewrap.rewrapComment",
-//   u: "insert-unicode.insertText",
-//   f: "copyFilePath",
-//   p: "workbench.action.gotoLine",
-//   x: "workbench.action.closeEditorsInOtherGroups",
-//   b: "gitlens.toggleFileBlame",
-//   m: "workbench.action.maximizeEditor",
-//   z: ["workbench.action.focusSecondEditorGroup", "workbench.action.quickOpen"],
-//   s: "editor.action.sortLinesAscending",
-//   n: "editor.action.rename",
-// };
 
 /////////////////
 //
 // to bind:
 //
 // todo:
-// - allow key chains, "h r": "workbench.action.reloadWindow"
 // - find file at point
 // - previous / next terminal
 // - jump into / out of cmd-j menu
