@@ -1,32 +1,70 @@
 # Brian's EXTension
 
-This is Brian's EXTension.
-If you aren't Brian, it's probably not an extension for you.
-This extension is published mostly to make it easier
-to share with myself.
+Bext is an extension that makes it easy for you to write your own vim-like keybindings.
 
-## Features
+Here's a small example:
 
-Lots of people use vim.
-Modal editing is a good idea, and vim has OK keybindings.
+```json
+"bext.keybindings": {
+  "i": "bext.enterInsert",
 
-But why does it need to be `hjkl`? Why not `jkl;`?
+  "h": "cursorLeft",
+  "j": "cursorDown",
+  "k": "cursorUp",
+  "l": "cursorRight"
+}
+```
 
-Why `0$`? Why not `op`?
+In this example,
+you can press `i` to enter insert mode,
+`hjkl` to move around,
+and finally `Escape` to return to normal mode.
 
-Why `Ctrl-U Ctrl-D`? Why not `ui`?
+Unlike vim modes, you start with a blank slate - get creative and make your very own key layout!
 
-Bext is a modal editor, but with keybindings that _aren't_ based on vim.
+## Keybindings by Example
 
-Instead, I made the keybindings by adding my most common shortcuts to a
-blank keyboard layout.
+The `bext.keybindings` object accepts a few different values for the keybindings.
 
-<!-- This lets me throw out vim shortcuts that I rarely used (`123456789qwtp[]\as`), and improve the placement of shortcuts I use often (`i Ctrl-R`) -->
+### `string`
 
-This let me throw out vim shortcuts that I rarely used, and improve the placement of shortcuts I use often.
+```json
+{
+  "h": "cursorLeft"
+}
+```
 
-## Release Notes
+This executes the VSCode command `cursorLeft`.
+You can find a list of all commands by pressing `Ctrl-K Ctrl-S`.
+For instance, I found this command because `LeftArrow` key is normally bound to `cursorLeft`.
 
-### 1.0.0
+### `string[]`
 
-Released on github.
+```json
+{
+  "o": ["editor.action.insertLineAfter", "bext.enterInsert"]
+}
+```
+
+Executes the list of commands in sequence.
+
+### `{selecting: any, default: any}`
+
+```json
+{
+  "h": { "selecting": "cursorLeftSelect", "default": "cursorLeft" }
+}
+```
+
+If text is highlighted, runs the first command.
+Otherwise, runs the second command.
+
+In the above example,
+if you already highlighted text,
+pressing `h` would move the cursor without canceling the selection.
+This is the same behavior as `Shift + LeftArrow`.
+
+## Similar Projectsk
+
+- [Xah Fly Keys](http://ergoemacs.org/misc/ergoemacs_vi_mode.html)
+- [NieuMode](https://github.com/appledelhi/neiumode)

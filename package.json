@@ -2,7 +2,7 @@
   "name": "bext",
   "displayName": "bext",
   "description": "Brian's EXTension",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
@@ -22,15 +22,12 @@
       "type": "object",
       "title": "Brian's Extension",
       "properties": {
-        "bext.coolness": {
-          "type": "number",
-          "default": 1337,
-          "description": "How cool is this extension?"
-        },
         "bext.keybindings": {
           "type": "object",
-          "default": {},
-          "description": "Keybindings"
+          "default": {
+            "i": "bext.enterInsert"
+          },
+          "description": "Keybindings map, key → vscode command"
         }
       }
     },
@@ -82,8 +79,7 @@
     "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
   },
   "dependencies": {
-    "lodash": "^4.17.11",
-    "vscode": "^1.1.29"
+    "lodash": "^4.17.11"
   },
   "husky": {
     "hooks": {

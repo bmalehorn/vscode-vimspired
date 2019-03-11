@@ -6,53 +6,22 @@ import { Range, Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
 import { pickBy } from "lodash";
 
+interface IBranch {
+  selecting?: Action;
+  default: Action;
+}
+
+type Action = string | string[] | (() => Thenable<void>) | null | IBranch;
+
+interface IKeymap {
+  [key: string]: Action;
+}
+
 let typeSubscription: vscode.Disposable | undefined;
 let lastKey: string | undefined;
 let zeroWidthSelecting = false;
 
-async function cancelSelection(): Promise<void> {
-  await executeCommand("cancelSelection");
-  zeroWidthSelecting = false;
-}
-
-async function toggleSelection(): Promise<void> {
-  const oldZeroWidthSelecting = zeroWidthSelecting;
-  await cancelSelection();
-  zeroWidthSelecting = !oldZeroWidthSelecting;
-}
-
-function adjustSelecting(): void {
-  if (normalSelecting()) {
-    zeroWidthSelecting = false;
-  }
-}
-
-function normalSelecting(): boolean {
-  return vscode.window.activeTextEditor!.selections.some(
-    selection => !selection.anchor.isEqual(selection.active),
-  );
-}
-
-function getSelecting(): boolean {
-  return normalSelecting() || zeroWidthSelecting;
-}
-
 let keymap: IKeymap = {};
-
-function updateKeymapFromConfiguration(): void {
-  const userKeybindings =
-    vscode.workspace.getConfiguration("bext.keybindings") || {};
-  const safeKeybindings = pickBy(
-    userKeybindings,
-    value =>
-      isString(value) ||
-      isStringList(value) ||
-      isNull(value) ||
-      isBranch(value),
-  );
-
-  keymap = { ...defaultKeymap, ...safeKeybindings };
-}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -91,6 +60,11 @@ export function activate(context: vscode.ExtensionContext) {
   enterNormal();
 }
 
+// this method is called when your extension is deactivated
+export function deactivate() {
+  enterInsert();
+}
+
 function enterNormal() {
   if (!typeSubscription) {
     typeSubscription = vscode.commands.registerCommand("type", onType);
@@ -115,9 +89,115 @@ async function setNormal(normal: boolean): Promise<void> {
   cancelSelection();
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {
-  enterInsert();
+function updateKeymapFromConfiguration(): void {
+  const userKeybindings =
+    vscode.workspace.getConfiguration("bext.keybindings") || {};
+  keymap = pickBy(
+    userKeybindings,
+    value =>
+      isString(value) ||
+      isStringList(value) ||
+      isNull(value) ||
+      isBranch(value),
+  );
+}
+
+function isString(x: any): x is string {
+  return typeof x === "string";
+}
+
+function isStringList(x: any): x is string[] {
+  return Array.isArray(x) && x.every(element => isString(element));
+}
+
+function isNull(x: any): x is null {
+  return x === null;
+}
+
+function isBranch(x: any): x is IBranch {
+  return typeof x === "object" && "default" in x;
+}
+
+async function evalAction(action: Action): Promise<void> {
+  if (isString(action)) {
+    await executeCommand(action);
+  } else if (isStringList(action)) {
+    for (const command of action) {
+      await executeCommand(command);
+    }
+  } else if (isBranch(action)) {
+    if (getSelecting() && action.selecting) {
+      await evalAction(action.selecting);
+    } else {
+      await evalAction(action.default);
+    }
+  } else if (!action) {
+    // do nothing
+  } else {
+    await action();
+  }
+}
+
+const hKeymap: IKeymap = {
+  r: "workbench.action.reloadWindow",
+  y: "rewrap.rewrapComment",
+  u: "insert-unicode.insertText",
+  f: "copyFilePath",
+  p: "workbench.action.gotoLine",
+  x: "workbench.action.closeEditorsInOtherGroups",
+  b: "gitlens.toggleFileBlame",
+  m: "workbench.action.maximizeEditor",
+  z: ["workbench.action.focusSecondEditorGroup", "workbench.action.quickOpen"],
+  s: "editor.action.sortLinesAscending",
+  n: "editor.action.rename",
+};
+
+/////////////////
+//
+// to bind:
+//
+// todo:
+// - find file at point
+// - previous / next terminal
+// - jump into / out of cmd-j menu
+// https://github.com/foxundermoon/vs-shell-format/blob/master/package.json
+
+async function onType(event: { text: string }): Promise<void> {
+  adjustSelecting();
+
+  const action = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
+  evalAction(action);
+  lastKey = event.text;
+}
+
+/////////////////////////
+// commands
+
+async function cancelSelection(): Promise<void> {
+  await executeCommand("cancelSelection");
+  zeroWidthSelecting = false;
+}
+
+async function toggleSelection(): Promise<void> {
+  const oldZeroWidthSelecting = zeroWidthSelecting;
+  await cancelSelection();
+  zeroWidthSelecting = !oldZeroWidthSelecting;
+}
+
+function adjustSelecting(): void {
+  if (normalSelecting()) {
+    zeroWidthSelecting = false;
+  }
+}
+
+function normalSelecting(): boolean {
+  return vscode.window.activeTextEditor!.selections.some(
+    selection => !selection.anchor.isEqual(selection.active),
+  );
+}
+
+function getSelecting(): boolean {
+  return normalSelecting() || zeroWidthSelecting;
 }
 
 function moveDown(): Promise<void> {
@@ -177,86 +257,4 @@ async function copyWord(): Promise<void> {
     await executeCommand("editor.action.addSelectionToNextFindMatch");
     await executeCommand("editor.action.clipboardCopyAction");
   });
-}
-
-interface IBranch {
-  selecting?: Action;
-  default: Action;
-}
-
-type Action = string | string[] | (() => Thenable<void>) | null | IBranch;
-
-interface IKeymap {
-  [key: string]: Action;
-}
-const defaultKeymap: IKeymap = {};
-
-const hKeymap: IKeymap = {
-  r: "workbench.action.reloadWindow",
-  y: "rewrap.rewrapComment",
-  u: "insert-unicode.insertText",
-  f: "copyFilePath",
-  p: "workbench.action.gotoLine",
-  x: "workbench.action.closeEditorsInOtherGroups",
-  b: "gitlens.toggleFileBlame",
-  m: "workbench.action.maximizeEditor",
-  z: ["workbench.action.focusSecondEditorGroup", "workbench.action.quickOpen"],
-  s: "editor.action.sortLinesAscending",
-  n: "editor.action.rename",
-};
-
-/////////////////
-//
-// to bind:
-//
-// todo:
-// - find file at point
-// - previous / next terminal
-// - jump into / out of cmd-j menu
-// https://github.com/foxundermoon/vs-shell-format/blob/master/package.json
-
-function isString(x: any): x is string {
-  return typeof x === "string";
-}
-
-function isStringList(x: any): x is string[] {
-  return Array.isArray(x) && x.every(element => isString(element));
-}
-
-function isNull(x: any): x is null {
-  return x === null;
-}
-
-function isBranch(x: any): x is IBranch {
-  return typeof x === "object" && "default" in x;
-}
-
-async function evalAction(action: Action): Promise<void> {
-  if (isString(action)) {
-    await executeCommand(action);
-  } else if (isStringList(action)) {
-    for (const command of action) {
-      await executeCommand(command);
-    }
-  } else if (isBranch(action)) {
-    if (getSelecting() && action.selecting) {
-      await evalAction(action.selecting);
-    } else {
-      await evalAction(action.default);
-    }
-  } else if (!action) {
-    // do nothing
-  } else {
-    await action();
-  }
-}
-
-async function onType(event: { text: string }): Promise<void> {
-  adjustSelecting();
-
-  const action = lastKey === "h" ? hKeymap[event.text] : keymap[event.text];
-  evalAction(action);
-
-  adjustSelecting();
-  lastKey = event.text;
 }
