@@ -64,7 +64,7 @@ if you already highlighted text,
 pressing `h` would move the cursor without canceling the selection.
 This is the same behavior as `Shift + LeftArrow`.
 
-## Similar Projectsk
+## Similar Projects
 
 - [Xah Fly Keys](http://ergoemacs.org/misc/ergoemacs_vi_mode.html)
 - [NieuMode](https://github.com/appledelhi/neiumode)
