@@ -47,8 +47,8 @@ function updateKeymapFromConfiguration(): void {
     value =>
       isString(value) ||
       isStringList(value) ||
-      isUndefined(value) ||
-      isWhenSelecting(value),
+      isNull(value) ||
+      isBranch(value),
   );
 
   keymap = { ...defaultKeymap, ...safeKeybindings };
@@ -180,113 +180,16 @@ async function copyWord(): Promise<void> {
 }
 
 interface IBranch {
-  whenSelecting: Action;
+  selecting?: Action;
   default: Action;
 }
 
-type Action = string | string[] | (() => Thenable<void>) | undefined | IBranch;
+type Action = string | string[] | (() => Thenable<void>) | null | IBranch;
 
 interface IKeymap {
   [key: string]: Action;
 }
-const defaultKeymap: IKeymap = {
-  "`": undefined,
-  "1": "workbench.action.findInFiles",
-  "2": "editor.action.goToDeclaration",
-  "@": "references-view.find",
-  "3": "editor.action.openLink",
-  "4": "removeSecondaryCursors",
-  "5": { whenSelecting: "cursorTopSelect", default: "cursorTop" },
-  "6": undefined,
-  "7": "workbench.action.navigateBack",
-  "8": {
-    whenSelecting: "cursorBottomSelect",
-    default: "cursorBottom",
-  },
-  "9": [
-    "cursorLineEnd",
-    "cursorHome",
-    "cursorHome",
-    "extension.smartBackspace",
-  ],
-  "0": "editor.action.marker.nextInFiles",
-  ")": "editor.action.marker.prevInFiles",
-  "-": undefined,
-  "=": "bext.swapActiveAndAnchor",
-  q: "editor.action.formatDocument",
-  Q: "tslint.fixAllProblems",
-  w: {
-    whenSelecting: "editor.action.clipboardCutAction",
-    default: [
-      "cursorLineStart",
-      "cursorEndSelect",
-      "cursorEndSelect",
-      "cursorRightSelect",
-      "editor.action.clipboardCutAction",
-    ],
-  },
-  e: "deleteLeft",
-  r: ["editor.action.insertLineAfter", "bext.enterInsert"],
-  t: "bext.toggleSelection",
-  y: "editor.action.wordHighlight.next",
-  Y: "editor.action.wordHighlight.prev",
-  u: "bext.moveDown",
-  i: "bext.moveUp",
-  o: {
-    // there is no "cursorLineStartSelect"; workaround by running "cursorHomeSelect" twice
-    whenSelecting: ["cursorHomeSelect", "cursorHomeSelect"],
-    default: "cursorLineStart",
-  },
-  O: { whenSelecting: "cursorHomeSelect", default: "cursorHome" },
-  p: {
-    whenSelecting: "cursorEndSelect",
-    default: "cursorLineEnd",
-  },
-  "[": "workbench.action.showCommands",
-  "]": undefined,
-  "\\": undefined,
-  a: {
-    whenSelecting: [
-      "editor.action.clipboardCopyAction",
-      "bext.cancelSelection",
-    ],
-    default: [
-      "cursorLineStart",
-      "cursorEndSelect",
-      "cursorEndSelect",
-      "cursorRightSelect",
-      "editor.action.clipboardCopyAction",
-      "bext.cancelSelection",
-    ],
-  },
-  s: "editor.action.clipboardPasteAction",
-  d: "deleteWordLeft",
-  f: "bext.enterInsert",
-  g: undefined,
-  j: { whenSelecting: "cursorDownSelect", default: "cursorDown" },
-  k: { whenSelecting: "cursorUpSelect", default: "cursorUp" },
-  l: { whenSelecting: "cursorLeftSelect", default: "cursorLeft" },
-  ";": { whenSelecting: "cursorRightSelect", default: "cursorRight" },
-  "'": "editor.action.commentLine",
-  z: undefined,
-  x: "bext.copyWord",
-  c: "editor.action.startFindReplaceAction",
-  v: "actions.find",
-  b: undefined,
-  n: undefined,
-  m: {
-    whenSelecting: "cursorWordStartLeftSelect",
-    default: "cursorWordStartLeft",
-  },
-  ",": {
-    whenSelecting: "cursorWordEndRightSelect",
-    default: "cursorWordEndRight",
-  },
-  ".": "workbench.action.focusNextGroup",
-  "/": "undo",
-  "?": "redo",
-  " ": "workbench.action.quickOpen",
-};
+const defaultKeymap: IKeymap = {};
 
 const hKeymap: IKeymap = {
   r: "workbench.action.reloadWindow",
@@ -320,12 +223,12 @@ function isStringList(x: any): x is string[] {
   return Array.isArray(x) && x.every(element => isString(element));
 }
 
-function isUndefined(x: any): x is undefined {
-  return typeof x === "undefined";
+function isNull(x: any): x is null {
+  return x === null;
 }
 
-function isWhenSelecting(x: any): x is IBranch {
-  return typeof x === "object" && "whenSelecting" in x && "default" in x;
+function isBranch(x: any): x is IBranch {
+  return typeof x === "object" && "default" in x;
 }
 
 async function evalAction(action: Action): Promise<void> {
@@ -335,14 +238,14 @@ async function evalAction(action: Action): Promise<void> {
     for (const command of action) {
       await executeCommand(command);
     }
-  } else if (isUndefined(action)) {
-    // do nothing
-  } else if (isWhenSelecting(action)) {
-    if (getSelecting()) {
-      await evalAction(action.whenSelecting);
+  } else if (isBranch(action)) {
+    if (getSelecting() && action.selecting) {
+      await evalAction(action.selecting);
     } else {
       await evalAction(action.default);
     }
+  } else if (!action) {
+    // do nothing
   } else {
     await action();
   }
