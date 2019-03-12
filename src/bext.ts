@@ -11,7 +11,7 @@ interface IBranch {
   default: Action;
 }
 
-type Action = string | string[] | null | IBranch | IKeymap;
+type Action = string | string[] | IBranch | IKeymap;
 
 interface IKeymap {
   [key: string]: Action;
@@ -19,13 +19,11 @@ interface IKeymap {
 
 let typeSubscription: vscode.Disposable | undefined;
 let zeroWidthSelecting = false;
-
 let rootKeymap: IKeymap = {};
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  console.log("@@@ activate");
   context.subscriptions.push(
     vscode.commands.registerCommand("bext.enterNormal", enterNormal),
   );
@@ -96,12 +94,11 @@ function updateKeymapFromConfiguration(): void {
   const userKeybindings =
     vscode.workspace.getConfiguration("bext.keybindings") || {};
   rootKeymap = pickBy(userKeybindings, isAction);
+  keymap = rootKeymap;
 }
 
 function isAction(x: any): x is Action {
-  return (
-    isString(x) || isStringList(x) || isNull(x) || isBranch(x) || isKeymap(x)
-  );
+  return isString(x) || isStringList(x) || isBranch(x) || isKeymap(x);
 }
 
 function isString(x: any): x is string {
@@ -112,19 +109,20 @@ function isStringList(x: any): x is string[] {
   return Array.isArray(x) && x.every(element => isString(element));
 }
 
-function isNull(x: any): x is null {
-  return x === null;
-}
-
 function isBranch(x: any): x is IBranch {
-  return typeof x === "object" && "default" in x;
+  return x !== null && typeof x === "object" && "default" in x;
 }
 
 function isKeymap(x: any): x is IKeymap {
-  return typeof x === "object" && !isBranch(x) && values(x).every(isAction);
+  return (
+    x !== null &&
+    typeof x === "object" &&
+    !isBranch(x) &&
+    values(x).every(isAction)
+  );
 }
 
-async function evalAction(action: Action): Promise<void> {
+async function evalAction(action: Action | undefined): Promise<void> {
   keymap = rootKeymap;
   if (isString(action)) {
     await executeCommand(action);
@@ -138,8 +136,6 @@ async function evalAction(action: Action): Promise<void> {
     } else {
       await evalAction(action.default);
     }
-  } else if (!action) {
-    // do nothing
   } else if (isKeymap(action)) {
     keymap = action;
   }
