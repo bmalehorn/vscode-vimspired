@@ -1,5 +1,6 @@
 "use strict";
 
+// tslint:disable-next-line
 import * as vscode from "vscode";
 // tslint:disable-next-line
 import { Range, Selection, TextEditorRevealType } from "vscode";
@@ -110,7 +111,16 @@ function isStringList(x: any): x is string[] {
 }
 
 function isBranch(x: any): x is IBranch {
-  return x !== null && typeof x === "object" && "default" in x;
+  if (x === null || typeof x !== "object" || !x.default) {
+    return false;
+  }
+  if (x.selecting && !isAction(x.selecting)) {
+    return false;
+  }
+  if (!isAction(x.default)) {
+    return false;
+  }
+  return true;
 }
 
 function isKeymap(x: any): x is IKeymap {
