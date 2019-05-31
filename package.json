@@ -79,7 +79,8 @@
     "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
   },
   "dependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "tslint": "^5.17.0"
   },
   "husky": {
     "hooks": {

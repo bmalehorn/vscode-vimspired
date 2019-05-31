@@ -258,3 +258,10 @@ async function copyWord(): Promise<void> {
     await executeCommand("editor.action.clipboardCopyAction");
   });
 }
+
+// async function openScratch(): Promise<void> {
+//   // export function openTextDocument(fileName: string): Thenable<TextDocument>;
+//   vscode.workspace.openTextDocument(
+//     "/Users/brianmalehorn/Dropbox (Personal)/opendoor/scratch.txt",
+//   );
+// }
