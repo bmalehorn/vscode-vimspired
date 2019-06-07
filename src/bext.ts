@@ -21,6 +21,7 @@ interface IKeymap {
 let typeSubscription: vscode.Disposable | undefined;
 let zeroWidthSelecting = false;
 let rootKeymap: IKeymap = {};
+let normalMode = true;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -53,8 +54,19 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("bext.cancelSelection", cancelSelection),
   );
 
-  vscode.workspace.onDidChangeConfiguration(updateKeymapFromConfiguration);
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(updateKeymapFromConfiguration),
+  );
   updateKeymapFromConfiguration();
+
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(updateCursor),
+  );
+  context.subscriptions.push(
+    vscode.window.onDidChangeVisibleTextEditors(events =>
+      events.forEach(updateCursor),
+    ),
+  );
 
   enterNormal();
 }
@@ -79,15 +91,23 @@ function enterInsert() {
   setNormal(false);
 }
 
+function updateCursor(editor: vscode.TextEditor | undefined): void {
+  if (!editor) {
+    return;
+  }
+  editor.options.cursorStyle = normalMode
+    ? vscode.TextEditorCursorStyle.Block
+    : vscode.TextEditorCursorStyle.Underline;
+}
+
 async function setNormal(normal: boolean): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     return;
   }
-  editor.options.cursorStyle = normal
-    ? vscode.TextEditorCursorStyle.Block
-    : vscode.TextEditorCursorStyle.Underline;
   await executeCommand("setContext", "bext.normal", normal);
+  normalMode = normal;
+  updateCursor(editor);
   cancelSelection();
 }
 
@@ -152,14 +172,10 @@ async function evalAction(action: Action | undefined): Promise<void> {
 }
 
 /////////////////
-//
-// to bind:
-//
 // todo:
-// - find file at point
-// - previous / next terminal
-// - jump into / out of cmd-j menu
-// https://github.com/foxundermoon/vs-shell-format/blob/master/package.json
+// - record video in screencast mode
+// - fixup cursorStyle on editor focus
+// - use "type": "branch" instead of "default" presence
 
 let keymap: IKeymap = rootKeymap;
 
@@ -258,10 +274,3 @@ async function copyWord(): Promise<void> {
     await executeCommand("editor.action.clipboardCopyAction");
   });
 }
-
-// async function openScratch(): Promise<void> {
-//   // export function openTextDocument(fileName: string): Thenable<TextDocument>;
-//   vscode.workspace.openTextDocument(
-//     "/Users/brianmalehorn/Dropbox (Personal)/opendoor/scratch.txt",
-//   );
-// }
