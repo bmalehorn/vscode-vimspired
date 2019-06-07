@@ -1,5 +1,10 @@
 # Change Log
 
+## 5.0.4
+
+- don't upload build files on publish
+- https://code.visualstudio.com/api/working-with-extensions/bundling-extension
+
 ## 5.0.3
 
 - updated build to webpack

@@ -7,3 +7,11 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 tslint.json
+
+.vscode
+node_modules
+out/
+src/
+dist/
+tsconfig.json
+webpack.config.js
