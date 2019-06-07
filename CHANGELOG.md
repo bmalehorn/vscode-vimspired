@@ -1,5 +1,9 @@
 # Change Log
 
+## 5.0.3
+
+- updated build to webpack
+
 ## 5.0.2
 
 - fixed an issue causing cursor to display as underline after opening a
