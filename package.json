@@ -1,7 +1,7 @@
 {
   "name": "bext",
-  "displayName": "bext",
-  "description": "Brian's EXTension",
+  "displayName": "Vimspired",
+  "description": "Create your own Vim-inspired keybindings!",
   "version": "5.0.5",
   "publisher": "bmalehorn",
   "engines": {
@@ -20,31 +20,31 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Brian's Extension",
+      "title": "Vimspired",
       "properties": {
-        "bext.keybindings": {
+        "vimspired.keybindings": {
           "type": "object",
+          "description": "Keybindings map, key → vscode command",
           "default": {
-            "i": "bext.enterInsert"
-          },
-          "description": "Keybindings map, key → vscode command"
+            "i": "vimspired.enterInsert"
+          }
         }
       }
     },
     "commands": [
       {
-        "command": "bext.enterNormal",
-        "title": "Bext: normal mode"
+        "command": "vimspired.enterNormal",
+        "title": "Vimspired: normal mode"
       },
       {
-        "command": "bext.enterInsert",
-        "title": "Bext: insert mode"
+        "command": "vimspired.enterInsert",
+        "title": "Vimspired: insert mode"
       }
     ],
     "keybindings": [
       {
         "key": "Escape",
-        "command": "bext.enterNormal",
+        "command": "vimspired.enterNormal",
         "when": "editorTextFocus"
       }
     ]

@@ -1,12 +1,12 @@
-# Brian's EXTension
+# Vimspired
 
-Bext is an extension that makes it easy for you to write your own vim-like keybindings.
+Vimspired is an extension that makes it easy for you to write your own vim-like keybindings.
 
 Here's a small example:
 
 ```json
-"bext.keybindings": {
-  "i": "bext.enterInsert",
+"vimspired.keybindings": {
+  "i": "vimspired.enterInsert",
 
   "h": "cursorLeft",
   "j": "cursorDown",
@@ -24,7 +24,7 @@ Unlike vim modes, you start with a blank slate - get creative and make your very
 
 ## Keybindings by Example
 
-The `bext.keybindings` object accepts a few different values for the keybindings.
+The `vimspired.keybindings` object accepts a few different values for the keybindings.
 
 ### Single Command: `string`
 
@@ -42,7 +42,7 @@ For instance, I found this command because `LeftArrow` key is normally bound to 
 
 ```json
 {
-  "o": ["editor.action.insertLineAfter", "bext.enterInsert"]
+  "o": ["editor.action.insertLineAfter", "vimspired.enterInsert"]
 }
 ```
 

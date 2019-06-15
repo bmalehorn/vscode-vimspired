@@ -27,31 +27,37 @@ let normalMode = true;
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand("bext.enterNormal", enterNormal),
+    vscode.commands.registerCommand("vimspired.enterNormal", enterNormal),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("bext.enterInsert", enterInsert),
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand("bext.toggleSelection", toggleSelection),
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand("bext.moveDown", moveDown),
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand("bext.moveUp", moveUp),
+    vscode.commands.registerCommand("vimspired.enterInsert", enterInsert),
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "bext.swapActiveAndAnchor",
+      "vimspired.toggleSelection",
+      toggleSelection,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("vimspired.moveDown", moveDown),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("vimspired.moveUp", moveUp),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "vimspired.swapActiveAndAnchor",
       swapActiveAndAnchor,
     ),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("bext.copyWord", copyWord),
+    vscode.commands.registerCommand("vimspired.copyWord", copyWord),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("bext.cancelSelection", cancelSelection),
+    vscode.commands.registerCommand(
+      "vimspired.cancelSelection",
+      cancelSelection,
+    ),
   );
 
   context.subscriptions.push(
@@ -105,7 +111,7 @@ async function setNormal(normal: boolean): Promise<void> {
   if (!editor) {
     return;
   }
-  await executeCommand("setContext", "bext.normal", normal);
+  await executeCommand("setContext", "vimspired.normal", normal);
   normalMode = normal;
   updateCursor(editor);
   cancelSelection();
@@ -113,7 +119,7 @@ async function setNormal(normal: boolean): Promise<void> {
 
 function updateKeymapFromConfiguration(): void {
   const userKeybindings =
-    vscode.workspace.getConfiguration("bext.keybindings") || {};
+    vscode.workspace.getConfiguration("vimspired.keybindings") || {};
   rootKeymap = pickBy(userKeybindings, isAction);
   keymap = rootKeymap;
 }
