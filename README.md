@@ -2,22 +2,24 @@
 
 Vimspired is an extension that makes it easy for you to write your own vim-like keybindings.
 
+![](doc/demo.gif)
+
 Here's a small example:
 
 ```json
 "vimspired.keybindings": {
-  "i": "vimspired.enterInsert",
+  "i": "vimspired.toggle",
 
-  "h": "cursorLeft",
-  "j": "cursorDown",
-  "k": "cursorUp",
-  "l": "cursorRight"
+  "w": "cursorUp",
+  "a": "cursorLeft",
+  "s": "cursorDown",
+  "d": "cursorRight"
 }
 ```
 
 In this example,
 you can press `i` to enter insert mode,
-`hjkl` to move around,
+`wasd` to move around,
 and finally `Escape` to return to normal mode.
 
 Unlike vim modes, you start with a blank slate - get creative and make your very own key layout!

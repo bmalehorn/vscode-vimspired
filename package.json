@@ -2,13 +2,13 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
   },
   "repository": {
-    "url": "https://github.com/bmalehorn/vscode-bext"
+    "url": "https://github.com/bmalehorn/vscode-vimspired"
   },
   "categories": [
     "Other"
