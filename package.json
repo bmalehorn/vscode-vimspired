@@ -1,8 +1,8 @@
 {
-  "name": "bext",
+  "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "5.0.5",
+  "version": "6.0.0",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
