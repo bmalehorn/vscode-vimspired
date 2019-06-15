@@ -27,6 +27,9 @@ let normalMode = true;
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
+    vscode.commands.registerCommand("vimspired.toggle", toggle),
+  );
+  context.subscriptions.push(
     vscode.commands.registerCommand("vimspired.enterNormal", enterNormal),
   );
   context.subscriptions.push(
@@ -80,6 +83,14 @@ export function activate(context: vscode.ExtensionContext) {
 // this method is called when your extension is deactivated
 export function deactivate() {
   enterInsert();
+}
+
+function toggle() {
+  if (normalMode) {
+    enterInsert();
+  } else {
+    enterNormal();
+  }
 }
 
 function enterNormal() {

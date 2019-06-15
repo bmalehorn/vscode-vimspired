@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
@@ -26,12 +26,16 @@
           "type": "object",
           "description": "Keybindings map, key → vscode command",
           "default": {
-            "i": "vimspired.enterInsert"
+            "i": "vimspired.toggle"
           }
         }
       }
     },
     "commands": [
+      {
+        "command": "vimspired.toggle",
+        "title": "Vimspired: toggle normal / insert mode"
+      },
       {
         "command": "vimspired.enterNormal",
         "title": "Vimspired: normal mode"
