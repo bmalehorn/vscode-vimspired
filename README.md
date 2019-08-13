@@ -80,3 +80,4 @@ This is the same behavior as `Shift + LeftArrow`.
 
 - [Xah Fly Keys](http://ergoemacs.org/misc/ergoemacs_vi_mode.html)
 - [NieuMode](https://github.com/appledelhi/neiumode)
+- [Kakoune](http://kakoune.org/)
