@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.1.4",
+  "version": "6.1.5",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
@@ -63,11 +63,6 @@
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "yarn run compile && node ./node_modules/vscode/bin/test"
   },
-  "extensionDependencies": [
-    "stkb.rewrap",
-    "brunnerh.insert-unicode",
-    "eamodio.gitlens"
-  ],
   "devDependencies": {
     "@types/lodash": "^4.14.134",
     "@types/mocha": "^5.2.7",
