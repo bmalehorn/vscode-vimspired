@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.1.6
+
+- remove undocumented `vimspired.moveDown` and `vimspired.moveUp`
+
 ## 5.0.4
 
 - don't upload build files on publish

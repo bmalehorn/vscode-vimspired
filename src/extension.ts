@@ -3,7 +3,7 @@
 // tslint:disable-next-line
 import * as vscode from "vscode";
 // tslint:disable-next-line
-import { Range, Selection, TextEditorRevealType } from "vscode";
+import { Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
 import { pickBy, values } from "lodash";
 
@@ -42,12 +42,6 @@ export function activate(context: vscode.ExtensionContext) {
     ),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("vimspired.moveDown", moveDown),
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand("vimspired.moveUp", moveUp),
-  );
-  context.subscriptions.push(
     vscode.commands.registerCommand(
       "vimspired.swapActiveAndAnchor",
       swapActiveAndAnchor,
@@ -64,9 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidChangeConfiguration(updateKeymapFromConfiguration),
+    vscode.workspace.onDidChangeConfiguration(updateFromConfig),
   );
-  updateKeymapFromConfiguration();
+  updateFromConfig();
 
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(updateCursor),
@@ -128,7 +122,7 @@ async function setNormal(normal: boolean): Promise<void> {
   cancelSelection();
 }
 
-function updateKeymapFromConfiguration(): void {
+function updateFromConfig(): void {
   const userKeybindings =
     vscode.workspace.getConfiguration("vimspired.keybindings") || {};
   rootKeymap = pickBy(userKeybindings, isAction);
@@ -231,40 +225,6 @@ function normalSelecting(): boolean {
 
 function getSelecting(): boolean {
   return normalSelecting() || zeroWidthSelecting;
-}
-
-function moveDown(): Promise<void> {
-  return _moveDown(10);
-}
-
-function moveUp(): Promise<void> {
-  return _moveDown(-10);
-}
-
-async function _moveDown(lines: number, buffer: number = 1) {
-  const editor = vscode.window.activeTextEditor!;
-  const { start, end } = editor.visibleRanges[0];
-  const newRange = new Range(
-    start.with(Math.max(start.line + lines, 0)),
-    end.with(Math.max(end.line + lines, 0)),
-  );
-  editor.revealRange(new Selection(newRange.start, newRange.end));
-
-  // put active inside new revealed range
-  if (editor.selection.active.compareTo(newRange.start) < 0) {
-    const newPosition = newRange.start.with(newRange.start.line + buffer, 0);
-    editor.selection = new Selection(
-      getSelecting() ? editor.selection.anchor : newPosition,
-      newPosition,
-    );
-  }
-  if (editor.selection.active.compareTo(newRange.end) > 0) {
-    const newPosition = newRange.end.with(newRange.end.line - buffer, 0);
-    editor.selection = new Selection(
-      getSelecting() ? editor.selection.anchor : newPosition,
-      newPosition,
-    );
-  }
 }
 
 async function swapActiveAndAnchor() {
