@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.1.7
+
+- added my config to README.md
+
 ## 6.1.6
 
 - remove undocumented `vimspired.moveDown` and `vimspired.moveUp`
