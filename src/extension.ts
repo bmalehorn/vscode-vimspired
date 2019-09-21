@@ -7,12 +7,19 @@ import { Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
 import { pickBy, values } from "lodash";
 
+type Action = FlatAction | FlatAction[];
+
+type FlatAction = string | IBranch | ICommand | IKeymap;
+
 interface IBranch {
   selecting?: Action;
   default: Action;
 }
 
-type Action = string | string[] | IBranch | IKeymap;
+interface ICommand {
+  command: string;
+  args?: {};
+}
 
 interface IKeymap {
   [key: string]: Action;
@@ -130,15 +137,21 @@ function updateFromConfig(): void {
 }
 
 function isAction(x: any): x is Action {
-  return isString(x) || isStringList(x) || isBranch(x) || isKeymap(x);
+  return (
+    isString(x) ||
+    isBranch(x) ||
+    isCommand(x) ||
+    isKeymap(x) ||
+    isFlatActionList(x)
+  );
 }
 
 function isString(x: any): x is string {
   return typeof x === "string";
 }
 
-function isStringList(x: any): x is string[] {
-  return Array.isArray(x) && x.every(element => isString(element));
+function isFlatActionList(x: any): x is FlatAction[] {
+  return Array.isArray(x) && x.every(element => isAction(element));
 }
 
 function isBranch(x: any): x is IBranch {
@@ -154,11 +167,21 @@ function isBranch(x: any): x is IBranch {
   return true;
 }
 
+function isCommand(x: any): x is ICommand {
+  return (
+    x !== null &&
+    typeof x === "object" &&
+    typeof x.command === "string" &&
+    (x.args === undefined || typeof x.args === "object")
+  );
+}
+
 function isKeymap(x: any): x is IKeymap {
   return (
     x !== null &&
     typeof x === "object" &&
     !isBranch(x) &&
+    !isCommand(x) &&
     values(x).every(isAction)
   );
 }
@@ -167,15 +190,21 @@ async function evalAction(action: Action | undefined): Promise<void> {
   keymap = rootKeymap;
   if (isString(action)) {
     await executeCommand(action);
-  } else if (isStringList(action)) {
-    for (const command of action) {
-      await executeCommand(command);
+  } else if (isFlatActionList(action)) {
+    for (const subAction of action) {
+      await evalAction(subAction);
     }
   } else if (isBranch(action)) {
     if (getSelecting() && action.selecting) {
       await evalAction(action.selecting);
-    } else {
+    } else if (!getSelecting()) {
       await evalAction(action.default);
+    }
+  } else if (isCommand(action)) {
+    if (action.args) {
+      await executeCommand(action.command, action.args);
+    } else {
+      await executeCommand(action.command);
     }
   } else if (isKeymap(action)) {
     keymap = action;

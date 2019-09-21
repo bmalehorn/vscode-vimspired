@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.2.0
+
+- added support for `{command: string, args: {}}`
+
 ## 6.1.7
 
 - added my config to README.md

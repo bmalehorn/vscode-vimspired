@@ -26,7 +26,7 @@ Unlike vim modes, you start with a blank slate - get creative and make your very
 
 ## Example Config
 
-Here's **my** layout, after a year of use:
+Here's **my** layout, after a lot of use:
 
 ```json
 {
@@ -183,7 +183,7 @@ This executes the VSCode command `cursorLeft`.
 You can find a list of all commands by pressing `Ctrl-K Ctrl-S`.
 For instance, I found this command because `LeftArrow` key is normally bound to `cursorLeft`.
 
-### Sequence of Commands: `string[]`
+### Sequence of Commands: `Action[]`
 
 ```json
 {
@@ -218,6 +218,28 @@ In the above example,
 if you already highlighted text,
 pressing `h` would move the cursor without canceling the selection.
 This is the same behavior as `Shift + LeftArrow`.
+
+### Command with Arguments: `{command: string, args: {}}`
+
+```json
+{
+  "d": {
+    "command": "editorScroll",
+    "args": {
+      "to": "down",
+      "by": "line",
+      "revealCursor": true,
+      "value": 10
+    }
+  }
+}
+```
+
+Run a single built-in command,
+but with arguments.
+
+A complete list of all VSCode built-in commands is available
+[here](https://code.visualstudio.com/api/references/commands).
 
 ## Similar Projects
 
