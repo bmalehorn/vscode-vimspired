@@ -1,5 +1,10 @@
 # Change Log
 
+## 6.3.0
+
+- added `vimspired.insertCursorStyle` and `vimspired.normalCursorStyle` settings
+- changed insert cursor style to `line` by default
+
 ## 6.2.0
 
 - added support for `{command: string, args: {}}`

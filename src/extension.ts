@@ -25,10 +25,21 @@ interface IKeymap {
   [key: string]: Action;
 }
 
+type Cursor =
+  | "block"
+  | "block-outline"
+  | "line"
+  | "line-thin"
+  | "underline"
+  | "underline-thin"
+  | undefined;
+
 let typeSubscription: vscode.Disposable | undefined;
 let zeroWidthSelecting = false;
 let rootKeymap: IKeymap = {};
 let normalMode = true;
+let insertCursorStyle: Cursor = "line";
+let normalCursorStyle: Cursor = "block";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -109,13 +120,31 @@ function enterInsert() {
   setNormal(false);
 }
 
+function stringToCursorStyle(cursor: Cursor): vscode.TextEditorCursorStyle {
+  if (cursor === "line") {
+    return vscode.TextEditorCursorStyle.Line;
+  } else if (cursor === "block") {
+    return vscode.TextEditorCursorStyle.Block;
+  } else if (cursor === "underline") {
+    return vscode.TextEditorCursorStyle.Underline;
+  } else if (cursor === "line-thin") {
+    return vscode.TextEditorCursorStyle.LineThin;
+  } else if (cursor === "block-outline") {
+    return vscode.TextEditorCursorStyle.BlockOutline;
+  } else if (cursor === "underline-thin") {
+    return vscode.TextEditorCursorStyle.UnderlineThin;
+  } else {
+    return vscode.TextEditorCursorStyle.Line;
+  }
+}
+
 function updateCursor(editor: vscode.TextEditor | undefined): void {
   if (!editor) {
     return;
   }
   editor.options.cursorStyle = normalMode
-    ? vscode.TextEditorCursorStyle.Block
-    : vscode.TextEditorCursorStyle.Underline;
+    ? stringToCursorStyle(normalCursorStyle)
+    : stringToCursorStyle(insertCursorStyle);
 }
 
 async function setNormal(normal: boolean): Promise<void> {
@@ -130,10 +159,12 @@ async function setNormal(normal: boolean): Promise<void> {
 }
 
 function updateFromConfig(): void {
-  const userKeybindings =
-    vscode.workspace.getConfiguration("vimspired.keybindings") || {};
-  rootKeymap = pickBy(userKeybindings, isAction);
+  const vimspired = vscode.workspace.getConfiguration("vimspired");
+  const keybindings = vimspired.get<object>("keybindings");
+  rootKeymap = pickBy(keybindings, isAction);
   keymap = rootKeymap;
+  insertCursorStyle = vimspired.get<Cursor>("insertCursorStyle", "line");
+  normalCursorStyle = vimspired.get<Cursor>("normalCursorStyle", "block");
 }
 
 function isAction(x: any): x is Action {

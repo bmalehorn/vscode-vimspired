@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
@@ -29,6 +29,32 @@
           "default": {
             "i": "vimspired.toggle"
           }
+        },
+        "vimspired.insertCursorStyle": {
+          "type": "string",
+          "enum": [
+            "block",
+            "block-outline",
+            "line",
+            "line-thin",
+            "underline",
+            "underline-thin"
+          ],
+          "default": "line",
+          "description": "Shape of the cursor when in insert mode."
+        },
+        "vimspired.normalCursorStyle": {
+          "type": "string",
+          "enum": [
+            "block",
+            "block-outline",
+            "line",
+            "line-thin",
+            "underline",
+            "underline-thin"
+          ],
+          "default": "block",
+          "description": "Shape of the cursor when in normal mode."
         }
       }
     },
