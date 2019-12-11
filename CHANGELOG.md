@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.3.1
+
+- added install count badges to README
+
 ## 6.3.0
 
 - added `vimspired.insertCursorStyle` and `vimspired.normalCursorStyle` settings
