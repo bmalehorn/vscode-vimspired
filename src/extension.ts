@@ -242,12 +242,6 @@ async function evalAction(action: Action | undefined): Promise<void> {
   }
 }
 
-/////////////////
-// todo:
-// - record video in screencast mode
-// - fixup cursorStyle on editor focus
-// - use "type": "branch" instead of "default" presence
-
 let keymap: IKeymap = rootKeymap;
 
 async function onType(event: { text: string }): Promise<void> {
