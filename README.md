@@ -27,7 +27,7 @@ and finally `Escape` to return to normal mode.
 
 Unlike vim modes, you start with a blank slate - get creative and make your very own key layout!
 
-## Example Config
+## Sample Config
 
 Here's **my** layout, after a lot of use:
 
@@ -170,7 +170,7 @@ Here's **my** layout, after a lot of use:
 }
 ```
 
-## Documentation
+## Keybindings
 
 The `vimspired.keybindings` object accepts a few different values for the keybindings.
 
@@ -243,6 +243,22 @@ but with arguments.
 
 A complete list of all VSCode built-in commands is available
 [here](https://code.visualstudio.com/api/references/commands).
+
+## Context variable
+
+You can add `"when": "vimspired.normal"` to a regular keybinding to only have it apply when Vimspired is active.
+
+```json
+{
+  "key": "ctrl+shift+i",
+  "command": "editor.action.formatDocument",
+  "when": "vimspired.normal"
+}
+```
+
+Similarly, you can add `"when": "!vimspired.normal"` to have it apply when in insertion mode.
+
+For more information on regular keybidings, see [Key Bindings for Visual Studio Code](https://code.visualstudio.com/docs/getstarted/keybindings).
 
 ## Similar Projects
 

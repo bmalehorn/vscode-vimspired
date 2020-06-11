@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.3.2
+
+- added documentation for `vimspired.normal` context variable
+
 ## 6.3.1
 
 - added install count badges to README
@@ -49,4 +53,4 @@ Pressing `g q` will run the command `rewrap.rewrapComment`.
 
 ## 1.0.0
 
-Released on github.
+- released on github
