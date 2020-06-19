@@ -3,6 +3,7 @@
 ## 6.3.3
 
 - fixed an issue where `vimspired.toggleSelecting` would disable multiple cursors
+- fixed an issue where multiple cursors would be disabled when toggling insert mode
 
 ## 6.3.2
 
