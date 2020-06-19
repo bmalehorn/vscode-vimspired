@@ -255,7 +255,10 @@ async function onType(event: { text: string }): Promise<void> {
 // commands
 
 async function cancelSelection(): Promise<void> {
-  await executeCommand("cancelSelection");
+  const editor = vscode.window.activeTextEditor!;
+  editor.selections = editor.selections.map(
+    ({ active }) => new Selection(active, active),
+  );
   zeroWidthSelecting = false;
 }
 

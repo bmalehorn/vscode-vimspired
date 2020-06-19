@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.3.3
+
+- fixed an issue where `vimspired.toggleSelecting` would disable multiple cursors
+
 ## 6.3.2
 
 - added documentation for `vimspired.normal` context variable
