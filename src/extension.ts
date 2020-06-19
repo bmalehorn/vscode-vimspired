@@ -248,7 +248,7 @@ async function onType(event: { text: string }): Promise<void> {
   adjustSelecting();
 
   const action = keymap[event.text];
-  evalAction(action);
+  await evalAction(action);
 }
 
 /////////////////////////
