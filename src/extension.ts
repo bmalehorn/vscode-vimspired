@@ -247,7 +247,11 @@ let keymap: IKeymap = rootKeymap;
 async function onType(event: { text: string }): Promise<void> {
   adjustSelecting();
 
-  const action = keymap[event.text];
+  let action = keymap[event.text];
+  if (action === undefined && keymap !== rootKeymap) {
+    keymap = rootKeymap;
+    action = keymap[event.text];
+  }
   await evalAction(action);
 }
 
