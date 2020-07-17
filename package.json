@@ -94,7 +94,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.0.7",
     "husky": "^2.4.0",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "prettier": "^1.18.0",
     "pretty-quick": "^1.11.0",
     "ts-loader": "^6.0.2",
@@ -111,7 +111,7 @@
     "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
   },
   "dependencies": {
-    "lodash": "^4.17.13"
+    "lodash": "^4.17.19"
   },
   "husky": {
     "hooks": {
