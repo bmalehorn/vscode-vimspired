@@ -105,19 +105,43 @@ function toggle() {
   }
 }
 
-function enterNormal() {
+async function enterNormal() {
   if (!typeSubscription) {
     typeSubscription = vscode.commands.registerCommand("type", onType);
   }
-  setNormal(true);
+
+  // double escape = cancel selection
+  if (normalMode) {
+    cancelSelection();
+  }
+
+  normalMode = true;
+
+  updateCursor();
+  await executeCommand("setContext", "vimspired.normal", true);
 }
 
-function enterInsert() {
+async function enterInsert() {
   if (typeSubscription) {
     typeSubscription.dispose();
     typeSubscription = undefined;
   }
-  setNormal(false);
+
+  normalMode = false;
+
+  updateCursor();
+  await executeCommand("setContext", "vimspired.normal", false);
+}
+
+function updateCursor(
+  editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor,
+): void {
+  if (!editor) {
+    return;
+  }
+  editor.options.cursorStyle = normalMode
+    ? stringToCursorStyle(normalCursorStyle)
+    : stringToCursorStyle(insertCursorStyle);
 }
 
 function stringToCursorStyle(cursor: Cursor): vscode.TextEditorCursorStyle {
@@ -136,26 +160,6 @@ function stringToCursorStyle(cursor: Cursor): vscode.TextEditorCursorStyle {
   } else {
     return vscode.TextEditorCursorStyle.Line;
   }
-}
-
-function updateCursor(editor: vscode.TextEditor | undefined): void {
-  if (!editor) {
-    return;
-  }
-  editor.options.cursorStyle = normalMode
-    ? stringToCursorStyle(normalCursorStyle)
-    : stringToCursorStyle(insertCursorStyle);
-}
-
-async function setNormal(normal: boolean): Promise<void> {
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) {
-    return;
-  }
-  await executeCommand("setContext", "vimspired.normal", normal);
-  normalMode = normal;
-  updateCursor(editor);
-  cancelSelection();
 }
 
 function updateFromConfig(): void {

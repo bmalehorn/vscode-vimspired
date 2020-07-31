@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.4.0
+
+- selection is preserved when entering & exiting normal mode
+
 ## 6.3.3
 
 - fixed an issue where `vimspired.toggleSelecting` would disable multiple cursors
