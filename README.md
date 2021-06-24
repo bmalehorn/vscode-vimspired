@@ -262,6 +262,9 @@ For more information on regular keybidings, see [Key Bindings for Visual Studio 
 
 ## Similar Projects
 
-- [Xah Fly Keys](http://ergoemacs.org/misc/ergoemacs_vi_mode.html)
-- [NieuMode](https://github.com/appledelhi/neiumode)
-- [Kakoune](http://kakoune.org/)
+- [ModalEdit](https://marketplace.visualstudio.com/items?itemName=johtela.vscode-modaledit): A fork of Vimspired, adding key repeat, JavaScript expressions, incremental search, bookmarks, and more. Includes a built-in Vim mode.
+- [Dance](https://marketplace.visualstudio.com/items?itemName=gregoire.dance): A custom modal layout for VSCode, inspired by Kakoune.
+- [Xah Fly Keys](http://ergoemacs.org/misc/ergoemacs_vi_mode.html): A custom modal layout for Emacs.
+- [NieuMode](https://github.com/appledelhi/neiumode): A custom modal layout for VSCode, design for Colemak keyboard layout.
+- [Kakoune](http://kakoune.org/): A custom modal editor for the command line, with strong multiple cursor support.
+- [SimpleVim](https://marketplace.visualstudio.com/items?itemName=jpotterm.simple-vim): Vim-like modal editing for VSCode, prioritizing native VSCode features over Vim concepts.
