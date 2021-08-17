@@ -106,7 +106,8 @@
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.1",
     "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.2"
+    "webpack-cli": "^3.3.2",
+    "vscode": "^1.1.37"
   },
   "__metadata": {
     "id": "20b6ea6f-43c5-4004-b393-c237975cbd76",
@@ -114,8 +115,7 @@
     "publisherId": "1215635c-400c-4cc8-96d3-f2d5da4774a4"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
-    "vscode": "^1.1.37"
+    "lodash": "^4.17.21"
   },
   "husky": {
     "hooks": {
