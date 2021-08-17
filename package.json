@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.4.0",
+  "version": "6.4.1",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.28.0"
@@ -16,6 +16,10 @@
   ],
   "activationEvents": [
     "*"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
   ],
   "main": "./dist/extension",
   "contributes": {

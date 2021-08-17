@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.4.1
+
+- run locally in remote dev container, instead of requiring network round-trip on each keypress
+
 ## 6.4.0
 
 - selection is preserved when entering & exiting normal mode
