@@ -1,7 +1,7 @@
 # Vimspired
 
-[![version number](https://vsmarketplacebadge.apphb.com/version-short/bmalehorn.vimspired.svg)](https://marketplace.visualstudio.com/items?itemName=bmalehorn.vimspired)
-[![install count](https://vsmarketplacebadge.apphb.com/installs-short/bmalehorn.vimspired.svg)](https://marketplace.visualstudio.com/items?itemName=bmalehorn.vimspired)
+[![version number](https://img.shields.io/visual-studio-marketplace/v/bmalehorn.vimspired)](https://marketplace.visualstudio.com/items?itemName=bmalehorn.vimspired)
+[![install count](https://img.shields.io/visual-studio-marketplace/i/bmalehorn.vimspired)](https://marketplace.visualstudio.com/items?itemName=bmalehorn.vimspired)
 
 Vimspired is an extension that makes it easy for you to write your own vim-like keybindings.
 
