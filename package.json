@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.4.3",
+  "version": "6.4.4",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.59.0"
@@ -88,26 +88,25 @@
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
     "compile": "webpack --mode none",
-    "watch": "webpack --mode none --watch",
-    "test-compile": "tsc -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "yarn run compile && node ./node_modules/vscode/bin/test"
+    "watch": "webpack --mode none --watch"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.134",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.0.7",
+    "@types/vscode": "^1.59.0",
+    "eslint": "^8.38.0",
+    "glob": "^10.0.0",
     "husky": "^2.4.0",
     "lodash": "^4.17.21",
-    "prettier": "^1.18.0",
+    "prettier": "^2.8.7",
     "pretty-quick": "^1.11.0",
     "ts-loader": "^6.0.2",
-    "tslint": "^5.17.0",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.5.1",
-    "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.2",
-    "vscode": "^1.1.37"
+    "typescript": "^5.0.4",
+    "vscode-test": "^1.6.1",
+    "@vscode/test-electron": "^2.3.0",
+    "webpack": "^5.79.0",
+    "webpack-cli": "^5.0.1"
   },
   "__metadata": {
     "id": "20b6ea6f-43c5-4004-b393-c237975cbd76",

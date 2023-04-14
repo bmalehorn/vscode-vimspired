@@ -84,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.onDidChangeActiveTextEditor(updateCursor),
   );
   context.subscriptions.push(
-    vscode.window.onDidChangeVisibleTextEditors(events =>
+    vscode.window.onDidChangeVisibleTextEditors((events) =>
       events.forEach(updateCursor),
     ),
   );
@@ -186,7 +186,7 @@ function isString(x: any): x is string {
 }
 
 function isFlatActionList(x: any): x is FlatAction[] {
-  return Array.isArray(x) && x.every(element => isAction(element));
+  return Array.isArray(x) && x.every((element) => isAction(element));
 }
 
 function isBranch(x: any): x is IBranch {
@@ -280,7 +280,7 @@ function adjustSelecting(): void {
 
 function normalSelecting(): boolean {
   return vscode.window.activeTextEditor!.selections.some(
-    selection => !selection.anchor.isEqual(selection.active),
+    (selection) => !selection.anchor.isEqual(selection.active),
   );
 }
 
