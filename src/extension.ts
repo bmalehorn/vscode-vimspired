@@ -5,7 +5,8 @@ import * as vscode from "vscode";
 // tslint:disable-next-line
 import { Selection, TextEditorRevealType } from "vscode";
 const { executeCommand } = vscode.commands;
-import { pickBy, values } from "lodash";
+import values from "lodash/values";
+import pickBy from "lodash/pickBy";
 
 type Action = FlatAction | FlatAction[];
 
