@@ -41,10 +41,16 @@ let rootKeymap: IKeymap = {};
 let normalMode = true;
 let insertCursorStyle: Cursor = "line";
 let normalCursorStyle: Cursor = "block";
+let outputChannel: vscode.LogOutputChannel;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  outputChannel = vscode.window.createOutputChannel("Vimspired", {
+    log: true,
+  });
+  context.subscriptions.push(outputChannel);
+
   context.subscriptions.push(
     vscode.commands.registerCommand("vimspired.toggle", toggle),
   );
@@ -96,6 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
 // this method is called when your extension is deactivated
 export function deactivate() {
   enterInsert();
+  typeSubscription?.dispose();
 }
 
 function toggle() {
@@ -250,8 +257,6 @@ async function evalAction(action: Action | undefined): Promise<void> {
 let keymap: IKeymap = rootKeymap;
 
 async function onType(event: { text: string }): Promise<void> {
-  // log the current position of the cursor (row, col) to console.log
-  console.log("hello")
   adjustSelecting();
 
   const action = keymap[event.text];
