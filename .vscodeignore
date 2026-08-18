@@ -2,6 +2,7 @@
 .git
 .jj
 .github
+.husky
 node_modules
 out/
 src/
