@@ -77,6 +77,12 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
+      "vimspired.safeSelectingCopy",
+      safeSelectingCopy,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
       "vimspired.cancelSelection",
       cancelSelection,
     ),
@@ -319,4 +325,14 @@ async function copyWord(): Promise<void> {
     await executeCommand("editor.action.addSelectionToNextFindMatch");
     await executeCommand("editor.action.clipboardCopyAction");
   });
+}
+
+async function safeSelectingCopy(): Promise<void> {
+  if (!getSelecting()) {
+    throw new Error("vimspired.safeSelectingCopy: not selecting");
+  }
+
+  const editor = vscode.window.activeTextEditor!;
+  const text = editor.document.getText(editor.selection);
+  await vscode.env.clipboard.writeText(text);
 }

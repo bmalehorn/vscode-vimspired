@@ -74,6 +74,10 @@
       {
         "command": "vimspired.enterInsert",
         "title": "Vimspired: insert mode"
+      },
+      {
+        "command": "vimspired.safeSelectingCopy",
+        "title": "Vimspired: copy the selected text without that one bug"
       }
     ],
     "keybindings": [
