@@ -250,6 +250,7 @@ async function evalAction(action: Action | undefined): Promise<void> {
 let keymap: IKeymap = rootKeymap;
 
 async function onType(event: { text: string }): Promise<void> {
+  // log the current position of the cursor (row, col) to console.log
   adjustSelecting();
 
   const action = keymap[event.text];

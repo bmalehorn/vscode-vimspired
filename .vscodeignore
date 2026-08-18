@@ -1,6 +1,11 @@
 .vscode
+.git
+.jj
+.github
 node_modules
 out/
 src/
 tsconfig.json
 webpack.config.js
+vsc-extension-quickstart.md
+*.vsix
