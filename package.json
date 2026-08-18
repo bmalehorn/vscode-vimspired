@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.4.5",
+  "version": "6.4.6",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.125.0"
@@ -93,7 +93,7 @@
     "vscode:prepublish": "webpack --mode production",
     "compile": "webpack --mode none",
     "watch": "webpack --mode none --watch",
-    "package": "vsce package",
+    "package": "vsce package --allow-star-activation",
     "prepare": "husky"
   },
   "devDependencies": {
