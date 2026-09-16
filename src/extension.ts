@@ -352,6 +352,18 @@ async function copyRelativeFilePathAndLineNumber(): Promise<void> {
   }
 
   const relativePath = vscode.workspace.asRelativePath(editor.document.uri);
-  const lineNumber = editor.selection.active.line + 1;
-  await vscode.env.clipboard.writeText(`${relativePath}:${lineNumber}`);
+  const { start, end } = editor.selection;
+  let minLine = start.line;
+  let maxLine = end.line;
+  if (maxLine > minLine && end.character === 0) {
+    maxLine -= 1;
+  }
+
+  const min = minLine + 1;
+  const max = maxLine + 1;
+  const location =
+    getSelecting() && max > min
+      ? `${min}:${max}`
+      : `${editor.selection.active.line + 1}`;
+  await vscode.env.clipboard.writeText(`${relativePath}:${location}`);
 }

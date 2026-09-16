@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.5.1
+
+- `vimspired.copyRelativeFilePathAndLineNumber` copies `path:start:end` for multi-line selections
+
 ## 6.5.0
 
 - added `vimspired.copyRelativeFilePathAndLineNumber`

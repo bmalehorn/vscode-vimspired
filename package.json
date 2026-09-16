@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.5.0",
+  "version": "6.5.1",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.125.0"
