@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.5.0
+
+- added `vimspired.copyRelativeFilePathAndLineNumber`
+
 ## 6.4.2
 
 - Update badge URLs

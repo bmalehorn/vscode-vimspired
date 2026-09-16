@@ -2,7 +2,7 @@
   "name": "vimspired",
   "displayName": "Vimspired",
   "description": "Create your own Vim-inspired keybindings!",
-  "version": "6.4.7",
+  "version": "6.5.0",
   "publisher": "bmalehorn",
   "engines": {
     "vscode": "^1.125.0"
@@ -78,6 +78,10 @@
       {
         "command": "vimspired.safeSelectingCopy",
         "title": "Vimspired: copy the selected text without that one bug"
+      },
+      {
+        "command": "vimspired.copyRelativeFilePathAndLineNumber",
+        "title": "Vimspired: copy relative file path and line number"
       }
     ],
     "keybindings": [

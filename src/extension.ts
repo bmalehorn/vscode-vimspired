@@ -83,6 +83,12 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
+      "vimspired.copyRelativeFilePathAndLineNumber",
+      copyRelativeFilePathAndLineNumber,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
       "vimspired.cancelSelection",
       cancelSelection,
     ),
@@ -335,4 +341,17 @@ async function safeSelectingCopy(): Promise<void> {
   const editor = vscode.window.activeTextEditor!;
   const text = editor.document.getText(editor.selection);
   await vscode.env.clipboard.writeText(text);
+}
+
+async function copyRelativeFilePathAndLineNumber(): Promise<void> {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    throw new Error(
+      "vimspired.copyRelativeFilePathAndLineNumber: no active editor",
+    );
+  }
+
+  const relativePath = vscode.workspace.asRelativePath(editor.document.uri);
+  const lineNumber = editor.selection.active.line + 1;
+  await vscode.env.clipboard.writeText(`${relativePath}:${lineNumber}`);
 }
